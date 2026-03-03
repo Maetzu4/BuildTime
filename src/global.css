@@ -1,3 +1,15 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import "tailwindcss";
+
+/* NativeWind no soporta CSS vars, los colores van en tailwind.config.js */
+/* Solo dejamos utilidades custom aquí */
+
+.m3-transition {
+  transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}

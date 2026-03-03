@@ -1,9 +1,3 @@
-import {
-  CreateHabitSheet,
-  CreateProjectSheet,
-  CreateTaskSheet,
-} from "@/components/create-sheets";
-import { FAB } from "@/components/fab";
 import { ProjectFilterStrip } from "@/components/filter-chips";
 import { SummaryCard } from "@/components/summary-card";
 import { TopAppBar } from "@/components/top-app-bar";
@@ -71,19 +65,6 @@ export default function HomeScreen() {
       >
         {homeSections.filter((s) => s.visible).map((s) => sectionMap[s.id])}
       </ScrollView>
-      <FAB label="New Task" onPress={() => setShowCreateTask(true)} />
-      <CreateTaskSheet
-        open={showCreateTask}
-        onClose={() => setShowCreateTask(false)}
-      />
-      <CreateHabitSheet
-        open={showCreateHabit}
-        onClose={() => setShowCreateHabit(false)}
-      />
-      <CreateProjectSheet
-        open={showCreateProject}
-        onClose={() => setShowCreateProject(false)}
-      />
     </SafeAreaView>
   );
 }
