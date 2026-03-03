@@ -1,12 +1,12 @@
-// index.tsx - test con colores built-in de tailwind
-import { Text, View } from "react-native";
+import { useAppStore } from "@/lib/store";
+import { Redirect } from "expo-router";
 
 export default function Index() {
-  return (
-    <View className="flex-1 items-center justify-center bg-blue-500">
-      <View className="bg-purple-600 px-6 py-4 rounded-2xl">
-        <Text className="text-white text-xl font-bold">NativeWind test</Text>
-      </View>
-    </View>
-  );
+  const onboardingComplete = useAppStore((s) => s.onboardingComplete);
+
+  if (onboardingComplete) {
+    return <Redirect href={"/(tabs)/home" as any} />;
+  }
+
+  return <Redirect href={"/onboarding" as any} />;
 }
