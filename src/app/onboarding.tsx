@@ -1,7 +1,7 @@
 import { useAppStore } from "@/lib/store";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { ArrowRight, Cloud, FolderOpen, Rocket } from "lucide-react-native";
+import { ArrowRight } from "lucide-react-native";
 import { useState } from "react";
 import { Text, TextInput, TouchableOpacity, View } from "react-native";
 import Animated, {
@@ -15,28 +15,22 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const STEPS = [
   {
-    icon: Rocket,
     emoji: "⚡",
     title: "BuildTime",
     subtitle: "Build your best self, one task at a time",
     cta: "Get Started",
-    showSkip: true,
   },
   {
-    icon: FolderOpen,
     emoji: "📁",
     title: "Start with a project",
     subtitle: "Projects help you organize your tasks and habits",
     cta: "Create project",
-    showSkip: true,
   },
   {
-    icon: Cloud,
     emoji: "☁️",
     title: "Save your progress",
     subtitle: "Sign in to sync across devices. You can always do this later.",
     cta: null,
-    showSkip: false,
   },
 ];
 
@@ -56,17 +50,18 @@ export default function OnboardingScreen() {
   }));
 
   function animateTo(nextStep: number) {
-    opacity.value = withTiming(0, { duration: 200 }, () => {
-      translateX.value = 50;
+    opacity.value = withTiming(0, { duration: 180 });
+    translateX.value = withTiming(-30, { duration: 180 }, () => {
+      translateX.value = 40;
       runOnJS(setStep)(nextStep);
-      translateX.value = withSpring(0, { damping: 20, stiffness: 300 });
-      opacity.value = withTiming(1, { duration: 250 });
+      translateX.value = withSpring(0, { damping: 18, stiffness: 280 });
+      opacity.value = withTiming(1, { duration: 220 });
     });
   }
 
   function finish() {
     completeOnboarding();
-    router.replace("/(tabs)" as any);
+    router.replace("/index" as any);
   }
 
   function handleNext() {
@@ -78,11 +73,8 @@ export default function OnboardingScreen() {
         targetDate: "2026-06-01",
       });
     }
-    if (step < 2) {
-      animateTo(step + 1);
-    } else {
-      finish();
-    }
+    if (step < 2) animateTo(step + 1);
+    else finish();
   }
 
   function handleSkip() {
@@ -98,25 +90,20 @@ export default function OnboardingScreen() {
 
   return (
     <View className="flex-1">
-      {/* Gradient background manual para RN */}
       <LinearGradient
         colors={["#6C3FC5", "#3B82F6"]}
         className="absolute inset-0"
-      />
-      <View
-        className="absolute inset-0 opacity-40 bg-secondary"
-        style={{ top: "50%" }}
       />
 
       <SafeAreaView className="flex-1">
         <View className="flex-1 items-center justify-center px-8">
           <Animated.View style={animStyle} className="items-center w-full">
-            {/* Icon box */}
+            {/* Icon */}
             <View className="w-20 h-20 bg-white/20 rounded-2xl items-center justify-center mb-6">
               <Text style={{ fontSize: 40 }}>{STEPS[step].emoji}</Text>
             </View>
 
-            {/* Title */}
+            {/* Title + subtitle */}
             <Text className="text-white text-3xl font-bold text-center mb-3">
               {STEPS[step].title}
             </Text>
@@ -134,7 +121,6 @@ export default function OnboardingScreen() {
                   onChangeText={setProjectName}
                   className="w-full h-14 bg-white/15 border border-white/20 rounded-xl px-4 text-white text-base"
                 />
-                {/* Timeline selector */}
                 <View className="flex-row border border-white/20 rounded-full overflow-hidden">
                   {(["short", "mid", "long"] as const).map((t) => (
                     <TouchableOpacity
@@ -157,7 +143,7 @@ export default function OnboardingScreen() {
               </View>
             )}
 
-            {/* Step 2 — sign in options */}
+            {/* Step 2 — sign in */}
             {step === 2 && (
               <View className="w-full gap-3 mb-8">
                 <TouchableOpacity
@@ -179,7 +165,7 @@ export default function OnboardingScreen() {
               </View>
             )}
 
-            {/* CTA button (steps 0 and 1) */}
+            {/* CTA steps 0 y 1 */}
             {step < 2 && (
               <View className="w-full gap-3">
                 <TouchableOpacity
@@ -215,7 +201,7 @@ export default function OnboardingScreen() {
           {STEPS.map((_, i) => (
             <View
               key={i}
-              className={`h-2 rounded-full bg-white transition-all ${
+              className={`h-2 rounded-full bg-white ${
                 i === step ? "w-6" : "w-2 opacity-30"
               }`}
             />

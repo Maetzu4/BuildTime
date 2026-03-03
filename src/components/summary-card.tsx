@@ -45,14 +45,16 @@ export function SummaryCard() {
   const circumference = 2 * Math.PI * radius;
   const targetOffset = circumference - (progress / 100) * circumference;
 
+  // Inicia siempre en circumference (círculo vacío)
   const animatedOffset = useSharedValue(circumference);
 
+  // Solo modifica .value dentro de useEffect, nunca durante render
   useEffect(() => {
     animatedOffset.value = withDelay(
       200,
       withTiming(targetOffset, { duration: 900 }),
     );
-  }, [progress]);
+  }, [targetOffset]);
 
   const animatedProps = useAnimatedProps(() => ({
     strokeDashoffset: animatedOffset.value,
