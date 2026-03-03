@@ -3,10 +3,11 @@ import { SummaryCard } from "@/components/summary-card";
 import { TopAppBar } from "@/components/top-app-bar";
 import { useAppStore } from "@/lib/store";
 import type { Habit, Project, Task } from "@/lib/types";
+import { fadeUp, staggerFadeUp } from "@/utils/animations";
 import { useRouter } from "expo-router";
 import { Calendar, Check, Flame } from "lucide-react-native";
-import { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 function todayStr() {
@@ -16,9 +17,6 @@ function todayStr() {
 export default function HomeScreen() {
   const { tasks, habits, projects, homeSections, selectedProjectFilter } =
     useAppStore();
-  const [showCreateTask, setShowCreateTask] = useState(false);
-  const [showCreateHabit, setShowCreateHabit] = useState(false);
-  const [showCreateProject, setShowCreateProject] = useState(false);
 
   const today = todayStr();
   const filteredTasks = tasks
@@ -37,22 +35,25 @@ export default function HomeScreen() {
     );
 
   const sectionMap: Record<string, React.ReactNode> = {
-    summary: <SummaryCard key="summary" />,
+    summary: (
+      <Animated.View key="summary" entering={staggerFadeUp(0)}>
+        <SummaryCard />
+      </Animated.View>
+    ),
     "projects-filter": (
-      <ProjectFilterStrip
-        key="filter"
-        onNewProject={() => setShowCreateProject(true)}
-      />
+      <Animated.View key="filter" entering={staggerFadeUp(1)}>
+        <ProjectFilterStrip />
+      </Animated.View>
     ),
     "tasks-today": (
-      <TasksTodaySection
-        key="tasks"
-        tasks={filteredTasks}
-        projects={projects}
-      />
+      <Animated.View key="tasks" entering={staggerFadeUp(2)}>
+        <TasksTodaySection tasks={filteredTasks} projects={projects} />
+      </Animated.View>
     ),
     "habits-today": (
-      <HabitsTodaySection key="habits" habits={filteredHabits} today={today} />
+      <Animated.View key="habits" entering={staggerFadeUp(3)}>
+        <HabitsTodaySection habits={filteredHabits} today={today} />
+      </Animated.View>
     ),
   };
 
@@ -62,6 +63,7 @@ export default function HomeScreen() {
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ gap: 20, paddingTop: 8, paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
       >
         {homeSections.filter((s) => s.visible).map((s) => sectionMap[s.id])}
       </ScrollView>
@@ -92,21 +94,27 @@ function TasksTodaySection({
           <Text className="text-primary text-xs font-medium">Calendar</Text>
         </TouchableOpacity>
       </View>
+
       {tasks.length === 0 ? (
-        <Text className="text-white/40 text-sm py-4">
-          No tasks for today. Create one!
-        </Text>
+        <Animated.View
+          entering={fadeUp}
+          className="bg-white/5 border border-white/10 rounded-2xl py-8 items-center"
+        >
+          <Text className="text-2xl mb-2">🎉</Text>
+          <Text className="text-white/40 text-sm">No tasks for today</Text>
+        </Animated.View>
       ) : (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: 12 }}
         >
-          {tasks.map((task) => {
+          {tasks.map((task, i) => {
             const project = projects.find((p) => p.id === task.projectId);
             return (
-              <View
+              <Animated.View
                 key={task.id}
+                entering={staggerFadeUp(i)}
                 className="w-56 p-4 rounded-2xl bg-white/5 border border-white/10 gap-2"
               >
                 <View className="flex-row items-start gap-3">
@@ -147,7 +155,7 @@ function TasksTodaySection({
                     {task.dueTime}
                   </Text>
                 </View>
-              </View>
+              </Animated.View>
             );
           })}
         </ScrollView>
@@ -179,19 +187,27 @@ function HabitsTodaySection({
           <Text className="text-primary text-xs font-medium">Calendar</Text>
         </TouchableOpacity>
       </View>
+
       {habits.length === 0 ? (
-        <Text className="text-white/40 text-sm py-4">No habits for today.</Text>
+        <Animated.View
+          entering={fadeUp}
+          className="bg-white/5 border border-white/10 rounded-2xl py-8 items-center"
+        >
+          <Text className="text-2xl mb-2">✨</Text>
+          <Text className="text-white/40 text-sm">No habits scheduled</Text>
+        </Animated.View>
       ) : (
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: 12 }}
         >
-          {habits.map((habit) => {
+          {habits.map((habit, i) => {
             const completed = habit.completedDates.includes(today);
             return (
-              <View
+              <Animated.View
                 key={habit.id}
+                entering={staggerFadeUp(i)}
                 className="w-44 p-4 rounded-2xl bg-white/5 border border-white/10 items-center gap-3"
               >
                 <Text className="text-white text-sm font-medium text-center leading-snug">
@@ -214,7 +230,7 @@ function HabitsTodaySection({
                     color={completed ? "white" : "rgba(255,255,255,0.3)"}
                   />
                 </TouchableOpacity>
-              </View>
+              </Animated.View>
             );
           })}
         </ScrollView>

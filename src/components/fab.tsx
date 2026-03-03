@@ -37,6 +37,12 @@ export function FAB({
         return [
           { icon: FolderOpen, label: "New Project", action: onCreateProject },
         ];
+      case "/calendar":
+        return [
+          { icon: CheckSquare, label: "New Task", action: onCreateTask },
+          { icon: Repeat, label: "New Habit", action: onCreateHabit },
+        ];
+
       default:
         return [
           { icon: CheckSquare, label: "New Task", action: onCreateTask },

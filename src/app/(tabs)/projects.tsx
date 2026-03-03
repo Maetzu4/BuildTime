@@ -1,6 +1,7 @@
 import { ChipFilter } from "@/components/filter-chips";
 import { TopAppBar } from "@/components/top-app-bar";
 import { useAppStore } from "@/lib/store";
+import { fadeUp, staggerFadeUp } from "@/utils/animations";
 import {
   ArrowLeft,
   CheckSquare,
@@ -9,6 +10,7 @@ import {
 } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const PROJECT_FILTERS = [
@@ -65,7 +67,6 @@ function ProgressBar({ value }: { value: number }) {
 export default function ProjectsScreen() {
   const { projects, tasks, habits } = useAppStore();
   const [filter, setFilter] = useState("all");
-  const [showCreate, setShowCreate] = useState(false);
   const [detailId, setDetailId] = useState<string | null>(null);
 
   const activeCount = projects.filter((p) => p.status === "active").length;
@@ -98,28 +99,35 @@ export default function ProjectsScreen() {
 
     return (
       <SafeAreaView className="flex-1 bg-dark">
-        {/* Header */}
         <View className="flex-row items-center gap-3 h-16 px-4">
-          <TouchableOpacity
-            onPress={() => setDetailId(null)}
-            className="w-10 h-10 rounded-full items-center justify-center bg-white/5"
-          >
-            <ArrowLeft size={20} color="white" />
-          </TouchableOpacity>
-          <Text
-            className="text-white text-xl font-semibold flex-1"
-            numberOfLines={1}
-          >
-            {project.name}
-          </Text>
+          <Animated.View entering={fadeUp}>
+            <TouchableOpacity
+              onPress={() => setDetailId(null)}
+              className="w-10 h-10 rounded-full items-center justify-center bg-white/5"
+            >
+              <ArrowLeft size={20} color="white" />
+            </TouchableOpacity>
+          </Animated.View>
+          <Animated.View entering={staggerFadeUp(1)} className="flex-1">
+            <Text
+              className="text-white text-xl font-semibold"
+              numberOfLines={1}
+            >
+              {project.name}
+            </Text>
+          </Animated.View>
         </View>
 
         <ScrollView
           className="flex-1"
           contentContainerStyle={{ padding: 16, gap: 20, paddingBottom: 100 }}
+          showsVerticalScrollIndicator={false}
         >
           {/* Project info card */}
-          <View className="p-5 rounded-2xl bg-white/5 border border-white/10 gap-3">
+          <Animated.View
+            entering={staggerFadeUp(0)}
+            className="p-5 rounded-2xl bg-white/5 border border-white/10 gap-3"
+          >
             <View className="flex-row items-center justify-between">
               <View className={`px-2 py-0.5 rounded-md ${ss.bg}`}>
                 <Text className={`text-xs font-semibold ${ss.text}`}>
@@ -146,10 +154,10 @@ export default function ProjectsScreen() {
             <Text className="text-white/30 text-[10px]">
               Due: {project.targetDate}
             </Text>
-          </View>
+          </Animated.View>
 
           {/* Tasks */}
-          <View className="gap-3">
+          <Animated.View entering={staggerFadeUp(1)} className="gap-3">
             <View className="flex-row items-center gap-2">
               <CheckSquare size={16} color="#3B82F6" />
               <Text className="text-white text-sm font-semibold">
@@ -162,31 +170,40 @@ export default function ProjectsScreen() {
               </Text>
             ) : (
               <View className="gap-2">
-                {projectTasks.map((t) => (
-                  <View
+                {projectTasks.map((t, i) => (
+                  <Animated.View
                     key={t.id}
+                    entering={staggerFadeUp(i + 2)}
                     className="p-3 rounded-xl bg-white/5 border border-white/10 flex-row items-center gap-3"
                   >
                     <View
-                      className={`w-2 h-2 rounded-full ${t.status === "completed" ? "bg-green-400" : "bg-secondary"}`}
+                      className={`w-2 h-2 rounded-full ${
+                        t.status === "completed"
+                          ? "bg-green-400"
+                          : "bg-secondary"
+                      }`}
                     />
                     <Text
                       numberOfLines={1}
-                      className={`text-sm flex-1 ${t.status === "completed" ? "line-through text-white/30" : "text-white"}`}
+                      className={`text-sm flex-1 ${
+                        t.status === "completed"
+                          ? "line-through text-white/30"
+                          : "text-white"
+                      }`}
                     >
                       {t.name}
                     </Text>
                     <Text className="text-white/30 text-[10px]">
                       {t.dueDate}
                     </Text>
-                  </View>
+                  </Animated.View>
                 ))}
               </View>
             )}
-          </View>
+          </Animated.View>
 
           {/* Habits */}
-          <View className="gap-3">
+          <Animated.View entering={staggerFadeUp(2)} className="gap-3">
             <View className="flex-row items-center gap-2">
               <Repeat size={16} color="#F59E0B" />
               <Text className="text-white text-sm font-semibold">
@@ -199,9 +216,10 @@ export default function ProjectsScreen() {
               </Text>
             ) : (
               <View className="gap-2">
-                {projectHabits.map((h) => (
-                  <View
+                {projectHabits.map((h, i) => (
+                  <Animated.View
                     key={h.id}
+                    entering={staggerFadeUp(i + 2)}
                     className="p-3 rounded-xl bg-white/5 border border-white/10 flex-row items-center gap-3"
                   >
                     <Text
@@ -213,11 +231,11 @@ export default function ProjectsScreen() {
                     <Text className="text-accent text-xs font-semibold">
                       {h.streak} streak
                     </Text>
-                  </View>
+                  </Animated.View>
                 ))}
               </View>
             )}
-          </View>
+          </Animated.View>
         </ScrollView>
       </SafeAreaView>
     );
@@ -230,9 +248,13 @@ export default function ProjectsScreen() {
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 100, gap: 16, paddingTop: 8 }}
+        showsVerticalScrollIndicator={false}
       >
         {/* Stats */}
-        <View className="flex-row gap-3 px-4">
+        <Animated.View
+          entering={staggerFadeUp(0)}
+          className="flex-row gap-3 px-4"
+        >
           <MiniStatsCard
             label="Active"
             value={activeCount}
@@ -243,22 +265,27 @@ export default function ProjectsScreen() {
             value={completedCount}
             subtitle="projects"
           />
-        </View>
+        </Animated.View>
 
-        <ChipFilter
-          options={PROJECT_FILTERS}
-          selected={filter}
-          onChange={setFilter}
-        />
+        <Animated.View entering={staggerFadeUp(1)}>
+          <ChipFilter
+            options={PROJECT_FILTERS}
+            selected={filter}
+            onChange={setFilter}
+          />
+        </Animated.View>
 
         {/* Project cards */}
         <View className="px-4 gap-3">
           {filtered.length === 0 ? (
-            <Text className="text-white/40 text-sm text-center py-8">
-              No projects match this filter.
-            </Text>
+            <Animated.View entering={fadeUp} className="items-center py-8">
+              <Text className="text-3xl mb-2">📂</Text>
+              <Text className="text-white/40 text-sm">
+                No projects match this filter
+              </Text>
+            </Animated.View>
           ) : (
-            filtered.map((project) => {
+            filtered.map((project, i) => {
               const projectTasks = tasks.filter(
                 (t) => t.projectId === project.id,
               );
@@ -275,60 +302,63 @@ export default function ProjectsScreen() {
               const ss = statusStyle(project.status);
 
               return (
-                <TouchableOpacity
-                  key={project.id}
-                  onPress={() => setDetailId(project.id)}
-                  activeOpacity={0.8}
-                  className="p-4 rounded-2xl bg-white/5 border border-white/10 gap-3"
-                >
-                  <View className="flex-row items-center justify-between">
-                    <Text
-                      className="text-white text-sm font-semibold flex-1"
-                      numberOfLines={1}
-                    >
-                      {project.name}
-                    </Text>
-                    <ChevronRight size={16} color="rgba(255,255,255,0.3)" />
-                  </View>
-
-                  <View className="flex-row items-center gap-2 flex-wrap">
-                    <View className="bg-white/10 px-2 py-0.5 rounded">
-                      <Text className="text-white/40 text-[10px] font-medium">
-                        {timelineLabel(project.timeline)}
+                <Animated.View key={project.id} entering={staggerFadeUp(i + 2)}>
+                  <TouchableOpacity
+                    onPress={() => setDetailId(project.id)}
+                    activeOpacity={0.8}
+                    className="p-4 rounded-2xl bg-white/5 border border-white/10 gap-3"
+                  >
+                    <View className="flex-row items-center justify-between">
+                      <Text
+                        className="text-white text-sm font-semibold flex-1"
+                        numberOfLines={1}
+                      >
+                        {project.name}
                       </Text>
+                      <ChevronRight size={16} color="rgba(255,255,255,0.3)" />
                     </View>
-                    <Text className="text-white/30 text-[10px]">
-                      Due: {project.targetDate}
-                    </Text>
-                    <View className={`px-2 py-0.5 rounded ${ss.bg}`}>
-                      <Text className={`text-[10px] font-semibold ${ss.text}`}>
-                        {project.status}
-                      </Text>
-                    </View>
-                  </View>
 
-                  <View className="flex-row items-center gap-2">
-                    <ProgressBar value={progress} />
-                    <Text className="text-white text-[10px] font-semibold">
-                      {Math.round(progress)}%
-                    </Text>
-                  </View>
-
-                  <View className="flex-row items-center gap-3">
-                    <View className="flex-row items-center gap-1">
-                      <CheckSquare size={12} color="rgba(255,255,255,0.3)" />
+                    <View className="flex-row items-center gap-2 flex-wrap">
+                      <View className="bg-white/10 px-2 py-0.5 rounded">
+                        <Text className="text-white/40 text-[10px] font-medium">
+                          {timelineLabel(project.timeline)}
+                        </Text>
+                      </View>
                       <Text className="text-white/30 text-[10px]">
-                        {projectTasks.length} tasks
+                        Due: {project.targetDate}
+                      </Text>
+                      <View className={`px-2 py-0.5 rounded ${ss.bg}`}>
+                        <Text
+                          className={`text-[10px] font-semibold ${ss.text}`}
+                        >
+                          {project.status}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <View className="flex-row items-center gap-2">
+                      <ProgressBar value={progress} />
+                      <Text className="text-white text-[10px] font-semibold">
+                        {Math.round(progress)}%
                       </Text>
                     </View>
-                    <View className="flex-row items-center gap-1">
-                      <Repeat size={12} color="rgba(255,255,255,0.3)" />
-                      <Text className="text-white/30 text-[10px]">
-                        {projectHabits.length} habits
-                      </Text>
+
+                    <View className="flex-row items-center gap-3">
+                      <View className="flex-row items-center gap-1">
+                        <CheckSquare size={12} color="rgba(255,255,255,0.3)" />
+                        <Text className="text-white/30 text-[10px]">
+                          {projectTasks.length} tasks
+                        </Text>
+                      </View>
+                      <View className="flex-row items-center gap-1">
+                        <Repeat size={12} color="rgba(255,255,255,0.3)" />
+                        <Text className="text-white/30 text-[10px]">
+                          {projectHabits.length} habits
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                </TouchableOpacity>
+                  </TouchableOpacity>
+                </Animated.View>
               );
             })
           )}

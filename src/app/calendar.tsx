@@ -2,10 +2,12 @@ import { CreateHabitSheet, CreateTaskSheet } from "@/components/create-sheets";
 import { FAB } from "@/components/fab";
 import { SubScreenBar } from "@/components/top-app-bar";
 import { useAppStore } from "@/lib/store";
+import { fadeUp, staggerFadeUp } from "@/utils/animations";
 import { useRouter } from "expo-router";
 import { Check, ChevronLeft, ChevronRight, Flame } from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -43,12 +45,12 @@ export default function CalendarScreen() {
     return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
   }
 
-  function hasDot(day: number) {
-    const d = dateStr(day);
-    return (
-      tasks.some((t) => t.dueDate === d) ||
-      habits.some((h) => h.completedDates.includes(d))
-    );
+  function hasTaskDot(day: number) {
+    return tasks.some((t) => t.dueDate === dateStr(day));
+  }
+
+  function hasHabitDot(day: number) {
+    return habits.some((h) => h.completedDates.includes(dateStr(day)));
   }
 
   const dayTasks = tasks.filter((t) => t.dueDate === selectedDate);
@@ -65,9 +67,13 @@ export default function CalendarScreen() {
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
       >
         {/* Month nav */}
-        <View className="flex-row items-center justify-between">
+        <Animated.View
+          entering={staggerFadeUp(0)}
+          className="flex-row items-center justify-between"
+        >
           <TouchableOpacity
             onPress={() => setCurrentMonth(new Date(year, month - 1, 1))}
             className="w-10 h-10 rounded-full items-center justify-center bg-white/5"
@@ -83,10 +89,10 @@ export default function CalendarScreen() {
           >
             <ChevronRight size={20} color="white" />
           </TouchableOpacity>
-        </View>
+        </Animated.View>
 
         {/* Calendar grid */}
-        <View>
+        <Animated.View entering={staggerFadeUp(1)}>
           {/* Weekday headers */}
           <View className="flex-row mb-1">
             {WEEKDAYS.map((d) => (
@@ -113,7 +119,8 @@ export default function CalendarScreen() {
               const ds = dateStr(day);
               const isSelected = ds === selectedDate;
               const isToday = ds === todayStr;
-              const dot = hasDot(day);
+              const taskDot = hasTaskDot(day);
+              const habitDot = hasHabitDot(day);
 
               return (
                 <TouchableOpacity
@@ -135,27 +142,38 @@ export default function CalendarScreen() {
                   >
                     {day}
                   </Text>
-                  {dot && (
-                    <View
-                      className={`absolute bottom-0.5 w-1 h-1 rounded-full ${
-                        isSelected ? "bg-white" : "bg-primary"
-                      }`}
-                    />
-                  )}
+                  {/* Dos dots: azul tasks, morado habits */}
+                  <View className="absolute bottom-0.5 flex-row gap-0.5">
+                    {taskDot && (
+                      <View
+                        className={`w-1 h-1 rounded-full ${
+                          isSelected ? "bg-white" : "bg-secondary"
+                        }`}
+                      />
+                    )}
+                    {habitDot && (
+                      <View
+                        className={`w-1 h-1 rounded-full ${
+                          isSelected ? "bg-white/70" : "bg-accent"
+                        }`}
+                      />
+                    )}
+                  </View>
                 </TouchableOpacity>
               );
             })}
           </View>
-        </View>
+        </Animated.View>
 
         {/* Tabs */}
-        <View className="bg-white/5 rounded-xl p-1 flex-row">
+        <Animated.View
+          entering={staggerFadeUp(2)}
+          className="bg-white/5 rounded-xl p-1 flex-row"
+        >
           {(["tasks", "habits"] as const).map((tab) => (
             <TouchableOpacity
               key={tab}
-              onPress={() => {
-                setActiveTab(tab);
-              }}
+              onPress={() => setActiveTab(tab)}
               className={`flex-1 h-8 rounded-lg items-center justify-center ${
                 activeTab === tab ? "bg-white/10" : ""
               }`}
@@ -171,19 +189,23 @@ export default function CalendarScreen() {
               </Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </Animated.View>
 
         {/* Tab content */}
         {activeTab === "tasks" ? (
           dayTasks.length === 0 ? (
-            <Text className="text-white/40 text-sm text-center py-6">
-              No tasks for this day.
-            </Text>
+            <Animated.View entering={fadeUp} className="items-center py-6">
+              <Text className="text-2xl mb-2">🎉</Text>
+              <Text className="text-white/40 text-sm">
+                No tasks for this day
+              </Text>
+            </Animated.View>
           ) : (
             <View className="gap-2">
-              {dayTasks.map((task) => (
-                <View
+              {dayTasks.map((task, i) => (
+                <Animated.View
                   key={task.id}
+                  entering={staggerFadeUp(i + 3)}
                   className="p-3 rounded-xl bg-white/5 border border-white/10 flex-row items-center gap-3"
                 >
                   <TouchableOpacity
@@ -211,21 +233,25 @@ export default function CalendarScreen() {
                   <Text className="text-white/30 text-[10px]">
                     {task.dueTime}
                   </Text>
-                </View>
+                </Animated.View>
               ))}
             </View>
           )
         ) : dayHabits.length === 0 ? (
-          <Text className="text-white/40 text-sm text-center py-6">
-            No habits for this day.
-          </Text>
+          <Animated.View entering={fadeUp} className="items-center py-6">
+            <Text className="text-2xl mb-2">✨</Text>
+            <Text className="text-white/40 text-sm">
+              No habits for this day
+            </Text>
+          </Animated.View>
         ) : (
           <View className="gap-2">
-            {dayHabits.map((habit) => {
+            {dayHabits.map((habit, i) => {
               const completed = habit.completedDates.includes(selectedDate);
               return (
-                <View
+                <Animated.View
                   key={habit.id}
+                  entering={staggerFadeUp(i + 3)}
                   className="p-3 rounded-xl bg-white/5 border border-white/10 flex-row items-center gap-3"
                 >
                   <TouchableOpacity
@@ -248,7 +274,7 @@ export default function CalendarScreen() {
                       {habit.streak}
                     </Text>
                   </View>
-                </View>
+                </Animated.View>
               );
             })}
           </View>
@@ -256,12 +282,9 @@ export default function CalendarScreen() {
       </ScrollView>
 
       <FAB
-        label={activeTab === "tasks" ? "New Task" : "New Habit"}
-        onPress={() =>
-          activeTab === "tasks"
-            ? setShowCreateTask(true)
-            : setShowCreateHabit(true)
-        }
+        onCreateTask={() => setShowCreateTask(true)}
+        onCreateHabit={() => setShowCreateHabit(true)}
+        onCreateProject={() => {}}
       />
       <CreateTaskSheet
         open={showCreateTask}

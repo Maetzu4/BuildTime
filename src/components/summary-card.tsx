@@ -1,7 +1,16 @@
 import { useAppStore } from "@/lib/store";
 import { useRouter } from "expo-router";
+import { useEffect } from "react";
 import { Text, TouchableOpacity, View } from "react-native";
+import Animated, {
+  useAnimatedProps,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from "react-native-reanimated";
 import { Circle, Svg } from "react-native-svg";
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 function todayStr() {
   return new Date().toISOString().split("T")[0];
@@ -34,7 +43,20 @@ export function SummaryCard() {
   const size = 80;
   const radius = 36;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (progress / 100) * circumference;
+  const targetOffset = circumference - (progress / 100) * circumference;
+
+  const animatedOffset = useSharedValue(circumference);
+
+  useEffect(() => {
+    animatedOffset.value = withDelay(
+      200,
+      withTiming(targetOffset, { duration: 900 }),
+    );
+  }, [progress]);
+
+  const animatedProps = useAnimatedProps(() => ({
+    strokeDashoffset: animatedOffset.value,
+  }));
 
   return (
     <TouchableOpacity
@@ -53,7 +75,7 @@ export function SummaryCard() {
             stroke="rgba(255,255,255,0.1)"
             strokeWidth="5"
           />
-          <Circle
+          <AnimatedCircle
             cx="40"
             cy="40"
             r={radius}
@@ -62,7 +84,7 @@ export function SummaryCard() {
             strokeWidth="5"
             strokeLinecap="round"
             strokeDasharray={circumference}
-            strokeDashoffset={offset}
+            animatedProps={animatedProps}
             rotation="-90"
             origin="40, 40"
           />

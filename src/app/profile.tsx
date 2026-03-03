@@ -1,10 +1,12 @@
 import { SubScreenBar } from "@/components/top-app-bar";
 import { useAppStore } from "@/lib/store";
+import { staggerFadeUp } from "@/utils/animations";
 import { useRouter } from "expo-router";
 import {
   Award,
   BarChart3,
   Calendar,
+  ChevronRight,
   Edit3,
   LogOut,
   Settings,
@@ -21,11 +23,12 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const router = useRouter();
-  const { user, navTab, updateUser, signOut, deleteAllData } = useAppStore();
+  const { user, updateUser, signOut, deleteAllData } = useAppStore();
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
@@ -94,10 +97,14 @@ export default function ProfileScreen() {
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
       >
         <View className="px-4 gap-6 pt-4">
           {/* Avatar + Info */}
-          <View className="items-center gap-4 py-6">
+          <Animated.View
+            entering={staggerFadeUp(0)}
+            className="items-center gap-4 py-6"
+          >
             <View className="w-24 h-24 rounded-full bg-primary/10 items-center justify-center">
               {user.avatar ? (
                 <Image
@@ -162,49 +169,56 @@ export default function ProfileScreen() {
                 </TouchableOpacity>
               </>
             )}
-          </View>
+          </Animated.View>
 
           {/* Menu */}
-          <View className="gap-1">
-            {menuItems.map(({ icon: Icon, label, action }) => (
-              <TouchableOpacity
-                key={label}
-                onPress={action}
-                className="flex-row items-center gap-4 h-14 px-4 rounded-2xl"
-                activeOpacity={0.7}
-              >
-                <Icon size={20} color="rgba(255,255,255,0.4)" />
-                <Text className="text-white text-sm font-medium">{label}</Text>
-              </TouchableOpacity>
+          <Animated.View entering={staggerFadeUp(1)} className="gap-1">
+            {menuItems.map(({ icon: Icon, label, action }, i) => (
+              <Animated.View key={label} entering={staggerFadeUp(i + 2)}>
+                <TouchableOpacity
+                  onPress={action}
+                  className="flex-row items-center gap-4 h-14 px-4 rounded-2xl hover:bg-white/5"
+                  activeOpacity={0.7}
+                >
+                  <Icon size={20} color="rgba(255,255,255,0.4)" />
+                  <Text className="text-white text-sm font-medium flex-1">
+                    {label}
+                  </Text>
+                  <ChevronRight size={16} color="rgba(255,255,255,0.2)" />
+                </TouchableOpacity>
+              </Animated.View>
             ))}
-          </View>
+          </Animated.View>
 
           {/* Danger Zone */}
-          <View className="pt-4 border-t border-white/10 gap-2">
+          <Animated.View
+            entering={staggerFadeUp(6)}
+            className="pt-4 border-t border-white/10 gap-2"
+          >
             <Text className="text-red-400 text-xs font-semibold px-4 mb-1">
               Danger Zone
             </Text>
-
             <TouchableOpacity
               onPress={handleSignOut}
               className="flex-row items-center gap-4 h-14 px-4 rounded-2xl"
               activeOpacity={0.7}
             >
               <LogOut size={20} color="#f87171" />
-              <Text className="text-red-400 text-sm font-medium">Sign Out</Text>
+              <Text className="text-red-400 text-sm font-medium flex-1">
+                Sign Out
+              </Text>
             </TouchableOpacity>
-
             <TouchableOpacity
               onPress={handleDeleteAll}
               className="flex-row items-center gap-4 h-14 px-4 rounded-2xl"
               activeOpacity={0.7}
             >
               <Trash2 size={20} color="#f87171" />
-              <Text className="text-red-400 text-sm font-medium">
+              <Text className="text-red-400 text-sm font-medium flex-1">
                 Delete All Data
               </Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         </View>
       </ScrollView>
     </SafeAreaView>

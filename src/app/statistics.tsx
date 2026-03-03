@@ -1,9 +1,11 @@
 import { SubScreenBar } from "@/components/top-app-bar";
 import { useAppStore } from "@/lib/store";
+import { fadeUp, staggerFadeUp } from "@/utils/animations";
 import { useRouter } from "expo-router";
 import { CheckSquare, Flame, Repeat, TrendingUp } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 function todayStr() {
@@ -108,36 +110,49 @@ export default function StatisticsScreen() {
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 16, gap: 16, paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
       >
         {/* Tabs */}
-        <View className="bg-white/5 rounded-xl p-1 flex-row">
+        <Animated.View
+          entering={staggerFadeUp(0)}
+          className="bg-white/5 rounded-xl p-1 flex-row"
+        >
           {TABS.map((tab) => (
             <TouchableOpacity
               key={tab}
               onPress={() => setActiveTab(tab)}
-              className={`flex-1 h-8 rounded-lg items-center justify-center ${activeTab === tab ? "bg-white/10" : ""}`}
+              className={`flex-1 h-8 rounded-lg items-center justify-center ${
+                activeTab === tab ? "bg-white/10" : ""
+              }`}
             >
               <Text
-                className={`text-[10px] font-semibold capitalize ${activeTab === tab ? "text-white" : "text-white/40"}`}
+                className={`text-[10px] font-semibold capitalize ${
+                  activeTab === tab ? "text-white" : "text-white/40"
+                }`}
               >
                 {tab}
               </Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </Animated.View>
 
         {/* Overview */}
         {activeTab === "overview" && (
-          <View className="gap-4">
-            <StatBox
-              icon={<TrendingUp size={20} color="#6C3FC5" />}
-              title="Overall Completion"
-              value={`${taskRate}%`}
-              subtitle={`${completedTasks} of ${totalTasks} tasks completed`}
+          <Animated.View entering={fadeUp} className="gap-4">
+            <Animated.View entering={staggerFadeUp(1)}>
+              <StatBox
+                icon={<TrendingUp size={20} color="#6C3FC5" />}
+                title="Overall Completion"
+                value={`${taskRate}%`}
+                subtitle={`${completedTasks} of ${totalTasks} tasks completed`}
+              >
+                <ProgressBar value={taskRate} />
+              </StatBox>
+            </Animated.View>
+            <Animated.View
+              entering={staggerFadeUp(2)}
+              className="flex-row gap-3"
             >
-              <ProgressBar value={taskRate} />
-            </StatBox>
-            <View className="flex-row gap-3">
               <SmallStat
                 value={todayTasksDone}
                 label="Tasks Done Today"
@@ -153,45 +168,54 @@ export default function StatisticsScreen() {
                 label="Active Projects"
                 color="text-primary"
               />
-            </View>
-            <StatBox
-              icon={<Flame size={20} color="#F59E0B" />}
-              title="Streak Stats"
-              value={`${bestStreak} days`}
-              subtitle="Best streak across all habits"
-            >
-              <View className="flex-row gap-4 mt-2">
-                <View className="items-center">
-                  <Text className="text-white text-lg font-bold">
-                    {avgStreak}
-                  </Text>
-                  <Text className="text-white/40 text-[10px]">Avg streak</Text>
+            </Animated.View>
+            <Animated.View entering={staggerFadeUp(3)}>
+              <StatBox
+                icon={<Flame size={20} color="#F59E0B" />}
+                title="Streak Stats"
+                value={`${bestStreak} days`}
+                subtitle="Best streak across all habits"
+              >
+                <View className="flex-row gap-4 mt-2">
+                  <View className="items-center">
+                    <Text className="text-white text-lg font-bold">
+                      {avgStreak}
+                    </Text>
+                    <Text className="text-white/40 text-[10px]">
+                      Avg streak
+                    </Text>
+                  </View>
+                  <View className="items-center">
+                    <Text className="text-white text-lg font-bold">
+                      {habits.length}
+                    </Text>
+                    <Text className="text-white/40 text-[10px]">
+                      Total habits
+                    </Text>
+                  </View>
                 </View>
-                <View className="items-center">
-                  <Text className="text-white text-lg font-bold">
-                    {habits.length}
-                  </Text>
-                  <Text className="text-white/40 text-[10px]">
-                    Total habits
-                  </Text>
-                </View>
-              </View>
-            </StatBox>
-          </View>
+              </StatBox>
+            </Animated.View>
+          </Animated.View>
         )}
 
         {/* Tasks */}
         {activeTab === "tasks" && (
-          <View className="gap-4">
-            <StatBox
-              icon={<CheckSquare size={20} color="#3B82F6" />}
-              title="Task Completion Rate"
-              value={`${taskRate}%`}
-              subtitle={`${completedTasks} completed, ${totalTasks - completedTasks} remaining`}
+          <Animated.View entering={fadeUp} className="gap-4">
+            <Animated.View entering={staggerFadeUp(1)}>
+              <StatBox
+                icon={<CheckSquare size={20} color="#3B82F6" />}
+                title="Task Completion Rate"
+                value={`${taskRate}%`}
+                subtitle={`${completedTasks} completed, ${totalTasks - completedTasks} remaining`}
+              >
+                <ProgressBar value={taskRate} color="bg-secondary" />
+              </StatBox>
+            </Animated.View>
+            <Animated.View
+              entering={staggerFadeUp(2)}
+              className="flex-row gap-3"
             >
-              <ProgressBar value={taskRate} color="bg-secondary" />
-            </StatBox>
-            <View className="flex-row gap-3">
               <SmallStat
                 value={tasks.filter((t) => t.priority === "high").length}
                 label="High Priority"
@@ -202,16 +226,23 @@ export default function StatisticsScreen() {
                 label="Medium Priority"
                 color="text-accent"
               />
-            </View>
-            <View className="p-4 rounded-2xl bg-white/5 border border-white/10 gap-2">
+            </Animated.View>
+            <Animated.View
+              entering={staggerFadeUp(3)}
+              className="p-4 rounded-2xl bg-white/5 border border-white/10 gap-2"
+            >
               <Text className="text-white text-xs font-semibold mb-1">
                 By Priority
               </Text>
-              {(["high", "medium", "low"] as const).map((p) => {
+              {(["high", "medium", "low"] as const).map((p, i) => {
                 const count = tasks.filter((t) => t.priority === p).length;
                 const pct = totalTasks > 0 ? (count / totalTasks) * 100 : 0;
                 return (
-                  <View key={p} className="flex-row items-center gap-3">
+                  <Animated.View
+                    key={p}
+                    entering={staggerFadeUp(i + 4)}
+                    className="flex-row items-center gap-3"
+                  >
                     <Text className="text-white/40 text-xs w-16 capitalize">
                       {p}
                     </Text>
@@ -228,49 +259,58 @@ export default function StatisticsScreen() {
                     <Text className="text-white text-xs font-semibold w-6 text-right">
                       {count}
                     </Text>
-                  </View>
+                  </Animated.View>
                 );
               })}
-            </View>
-          </View>
+            </Animated.View>
+          </Animated.View>
         )}
 
         {/* Habits */}
         {activeTab === "habits" && (
-          <View className="gap-4">
-            <StatBox
-              icon={<Repeat size={20} color="#F59E0B" />}
-              title="Habit Streaks"
-              value={`${bestStreak} days`}
-              subtitle="Longest streak achieved"
-            >
-              <View className="gap-2 mt-3">
-                {habits.map((h) => (
-                  <View key={h.id} className="flex-row items-center gap-3">
-                    <Text
-                      numberOfLines={1}
-                      className="text-white text-xs flex-1"
+          <Animated.View entering={fadeUp} className="gap-4">
+            <Animated.View entering={staggerFadeUp(1)}>
+              <StatBox
+                icon={<Repeat size={20} color="#F59E0B" />}
+                title="Habit Streaks"
+                value={`${bestStreak} days`}
+                subtitle="Longest streak achieved"
+              >
+                <View className="gap-2 mt-3">
+                  {habits.map((h, i) => (
+                    <Animated.View
+                      key={h.id}
+                      entering={staggerFadeUp(i + 2)}
+                      className="flex-row items-center gap-3"
                     >
-                      {h.name}
-                    </Text>
-                    <View className="flex-row items-center gap-1.5">
-                      <ProgressBar
-                        value={
-                          h.longestStreak > 0
-                            ? (h.streak / h.longestStreak) * 100
-                            : 0
-                        }
-                        color="bg-accent"
-                      />
-                      <Text className="text-white/40 text-[10px] w-10 text-right">
-                        {h.streak}/{h.longestStreak}
+                      <Text
+                        numberOfLines={1}
+                        className="text-white text-xs flex-1"
+                      >
+                        {h.name}
                       </Text>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            </StatBox>
-            <View className="flex-row gap-3">
+                      <View className="flex-row items-center gap-1.5">
+                        <ProgressBar
+                          value={
+                            h.longestStreak > 0
+                              ? (h.streak / h.longestStreak) * 100
+                              : 0
+                          }
+                          color="bg-accent"
+                        />
+                        <Text className="text-white/40 text-[10px] w-10 text-right">
+                          {h.streak}/{h.longestStreak}
+                        </Text>
+                      </View>
+                    </Animated.View>
+                  ))}
+                </View>
+              </StatBox>
+            </Animated.View>
+            <Animated.View
+              entering={staggerFadeUp(2)}
+              className="flex-row gap-3"
+            >
               <SmallStat
                 value={habits.filter((h) => h.frequency === "daily").length}
                 label="Daily Habits"
@@ -281,14 +321,17 @@ export default function StatisticsScreen() {
                 label="Weekly Habits"
                 color="text-secondary"
               />
-            </View>
-          </View>
+            </Animated.View>
+          </Animated.View>
         )}
 
         {/* Projects */}
         {activeTab === "projects" && (
-          <View className="gap-4">
-            <View className="flex-row gap-3">
+          <Animated.View entering={fadeUp} className="gap-4">
+            <Animated.View
+              entering={staggerFadeUp(1)}
+              className="flex-row gap-3"
+            >
               <SmallStat
                 value={activeProjects}
                 label="Active"
@@ -299,8 +342,8 @@ export default function StatisticsScreen() {
                 label="Completed"
                 color="text-green-400"
               />
-            </View>
-            {projects.map((project) => {
+            </Animated.View>
+            {projects.map((project, i) => {
               const pTasks = tasks.filter((t) => t.projectId === project.id);
               const pDone = pTasks.filter(
                 (t) => t.status === "completed",
@@ -308,8 +351,9 @@ export default function StatisticsScreen() {
               const progress =
                 pTasks.length > 0 ? (pDone / pTasks.length) * 100 : 0;
               return (
-                <View
+                <Animated.View
                   key={project.id}
+                  entering={staggerFadeUp(i + 2)}
                   className="p-4 rounded-2xl bg-white/5 border border-white/10 gap-2"
                 >
                   <View className="flex-row items-center justify-between">
@@ -324,10 +368,10 @@ export default function StatisticsScreen() {
                   <Text className="text-white/30 text-[10px]">
                     {pDone}/{pTasks.length} tasks completed
                   </Text>
-                </View>
+                </Animated.View>
               );
             })}
-          </View>
+          </Animated.View>
         )}
       </ScrollView>
     </SafeAreaView>

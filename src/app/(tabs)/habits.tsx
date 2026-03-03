@@ -1,9 +1,11 @@
 import { ChipFilter, ProjectFilterStrip } from "@/components/filter-chips";
 import { TopAppBar } from "@/components/top-app-bar";
 import { useAppStore } from "@/lib/store";
+import { fadeUp, staggerFadeUp } from "@/utils/animations";
 import { Check, Flame } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 function todayStr() {
@@ -36,7 +38,6 @@ function MiniStatsCard({
   );
 }
 
-// ── Progress Bar ──────────────────────────────────────────────
 function ProgressBar({ value }: { value: number }) {
   return (
     <View className="flex-1 h-1.5 bg-white/10 rounded-full overflow-hidden">
@@ -52,7 +53,6 @@ export default function HabitsScreen() {
   const { habits, projects, selectedProjectFilter, toggleHabitComplete } =
     useAppStore();
   const [filter, setFilter] = useState("all");
-  const [showCreate, setShowCreate] = useState(false);
 
   const today = todayStr();
   const todayDate = new Date();
@@ -97,9 +97,13 @@ export default function HabitsScreen() {
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ paddingBottom: 100, gap: 16, paddingTop: 8 }}
+        showsVerticalScrollIndicator={false}
       >
         {/* Weekly Calendar */}
-        <View className="flex-row justify-between px-4">
+        <Animated.View
+          entering={staggerFadeUp(0)}
+          className="flex-row justify-between px-4"
+        >
           {weekDays.map((day, i) => {
             const dateStr = day.toISOString().split("T")[0];
             const isToday = dateStr === today;
@@ -141,10 +145,13 @@ export default function HabitsScreen() {
               </View>
             );
           })}
-        </View>
+        </Animated.View>
 
         {/* Stats */}
-        <View className="flex-row gap-3 px-4">
+        <Animated.View
+          entering={staggerFadeUp(1)}
+          className="flex-row gap-3 px-4"
+        >
           <MiniStatsCard
             label="Best Streak"
             value={bestStreak}
@@ -155,23 +162,31 @@ export default function HabitsScreen() {
             value={todayCompleted}
             subtitle={`of ${habits.length} done`}
           />
-        </View>
+        </Animated.View>
 
-        <ProjectFilterStrip />
-        <ChipFilter
-          options={HABIT_FILTERS}
-          selected={filter}
-          onChange={setFilter}
-        />
+        <Animated.View entering={staggerFadeUp(2)}>
+          <ProjectFilterStrip />
+        </Animated.View>
+
+        <Animated.View entering={staggerFadeUp(3)}>
+          <ChipFilter
+            options={HABIT_FILTERS}
+            selected={filter}
+            onChange={setFilter}
+          />
+        </Animated.View>
 
         {/* Habit list */}
         <View className="px-4 gap-2">
           {filtered.length === 0 ? (
-            <Text className="text-white/40 text-sm text-center py-8">
-              No habits match this filter.
-            </Text>
+            <Animated.View entering={fadeUp} className="items-center py-8">
+              <Text className="text-3xl mb-2">🌱</Text>
+              <Text className="text-white/40 text-sm">
+                No habits match this filter
+              </Text>
+            </Animated.View>
           ) : (
-            filtered.map((habit) => {
+            filtered.map((habit, i) => {
               const project = projects.find((p) => p.id === habit.projectId);
               const completed = habit.completedDates.includes(today);
               const progressPct =
@@ -180,8 +195,9 @@ export default function HabitsScreen() {
                   : 0;
 
               return (
-                <View
+                <Animated.View
                   key={habit.id}
+                  entering={staggerFadeUp(i + 4)}
                   className="bg-white/5 border border-white/10 rounded-2xl p-4 flex-row items-center gap-3"
                 >
                   <View className="flex-1 min-w-0">
@@ -241,7 +257,7 @@ export default function HabitsScreen() {
                       color={completed ? "white" : "rgba(255,255,255,0.3)"}
                     />
                   </TouchableOpacity>
-                </View>
+                </Animated.View>
               );
             })
           )}

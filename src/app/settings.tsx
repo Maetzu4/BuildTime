@@ -1,5 +1,6 @@
 import { SubScreenBar } from "@/components/top-app-bar";
 import { useAppStore } from "@/lib/store";
+import { staggerFadeUp } from "@/utils/animations";
 import { useRouter } from "expo-router";
 import {
   Bell,
@@ -14,6 +15,7 @@ import {
 } from "lucide-react-native";
 import { useState } from "react";
 import { ScrollView, Switch, Text, TouchableOpacity, View } from "react-native";
+import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const THEME_COLORS = [
@@ -78,25 +80,34 @@ export default function SettingsScreen() {
       <ScrollView
         className="flex-1"
         contentContainerStyle={{ padding: 16, gap: 24, paddingBottom: 40 }}
+        showsVerticalScrollIndicator={false}
       >
         {/* Appearance */}
-        <View className="gap-2">
+        <Animated.View entering={staggerFadeUp(0)} className="gap-2">
           <SectionLabel label="Appearance" />
-          <SettingRow
-            icon={Moon}
-            label="Dark Mode"
-            right={
-              <Switch
-                value={darkMode}
-                onValueChange={setDarkMode}
-                trackColor={{ false: "rgba(255,255,255,0.1)", true: "#6C3FC5" }}
-                thumbColor="white"
-              />
-            }
-          />
+          <Animated.View entering={staggerFadeUp(1)}>
+            <SettingRow
+              icon={Moon}
+              label="Dark Mode"
+              right={
+                <Switch
+                  value={darkMode}
+                  onValueChange={setDarkMode}
+                  trackColor={{
+                    false: "rgba(255,255,255,0.1)",
+                    true: "#6C3FC5",
+                  }}
+                  thumbColor="white"
+                />
+              }
+            />
+          </Animated.View>
 
           {/* Theme colors */}
-          <View className="p-4 rounded-2xl bg-white/5 border border-white/10 gap-3">
+          <Animated.View
+            entering={staggerFadeUp(2)}
+            className="p-4 rounded-2xl bg-white/5 border border-white/10 gap-3"
+          >
             <View className="flex-row items-center gap-3">
               <Palette size={20} color="rgba(255,255,255,0.4)" />
               <Text className="text-white text-sm font-medium">
@@ -104,24 +115,29 @@ export default function SettingsScreen() {
               </Text>
             </View>
             <View className="flex-row gap-3">
-              {THEME_COLORS.map((color) => (
-                <TouchableOpacity
+              {THEME_COLORS.map((color, i) => (
+                <Animated.View
                   key={color.value}
-                  className="w-9 h-9 rounded-full border-2 border-white/20"
-                  style={{ backgroundColor: color.value }}
-                  activeOpacity={0.8}
-                />
+                  entering={staggerFadeUp(i + 3)}
+                >
+                  <TouchableOpacity
+                    className="w-9 h-9 rounded-full border-2 border-white/20"
+                    style={{ backgroundColor: color.value }}
+                    activeOpacity={0.8}
+                  />
+                </Animated.View>
               ))}
             </View>
-          </View>
-        </View>
+          </Animated.View>
+        </Animated.View>
 
         {/* Customize Home */}
-        <View className="gap-2">
+        <Animated.View entering={staggerFadeUp(8)} className="gap-2">
           <SectionLabel label="Customize Home" />
           {homeSections.map((section, idx) => (
-            <View
+            <Animated.View
               key={section.id}
+              entering={staggerFadeUp(idx + 9)}
               className="flex-row items-center gap-3 h-14 px-4 rounded-2xl bg-white/5 border border-white/10"
             >
               <GripVertical size={16} color="rgba(255,255,255,0.3)" />
@@ -129,7 +145,6 @@ export default function SettingsScreen() {
                 {section.label}
               </Text>
 
-              {/* Up/Down buttons */}
               <View className="flex-row items-center gap-1">
                 <TouchableOpacity
                   onPress={() => moveSection(idx, -1)}
@@ -161,7 +176,6 @@ export default function SettingsScreen() {
                 </TouchableOpacity>
               </View>
 
-              {/* Visibility toggle */}
               <TouchableOpacity
                 onPress={() => toggleHomeSection(section.id)}
                 className="w-8 h-8 rounded-lg items-center justify-center"
@@ -172,55 +186,70 @@ export default function SettingsScreen() {
                   <EyeOff size={16} color="rgba(255,255,255,0.3)" />
                 )}
               </TouchableOpacity>
-            </View>
+            </Animated.View>
           ))}
-        </View>
+        </Animated.View>
 
         {/* Notifications */}
-        <View className="gap-2">
+        <Animated.View entering={staggerFadeUp(14)} className="gap-2">
           <SectionLabel label="Notifications" />
-          <SettingRow
-            icon={Bell}
-            label="Task Reminders"
-            right={
-              <Switch
-                value={taskReminders}
-                onValueChange={setTaskReminders}
-                trackColor={{ false: "rgba(255,255,255,0.1)", true: "#6C3FC5" }}
-                thumbColor="white"
-              />
-            }
-          />
-          <SettingRow
-            icon={Bell}
-            label="Habit Reminders"
-            right={
-              <Switch
-                value={habitReminders}
-                onValueChange={setHabitReminders}
-                trackColor={{ false: "rgba(255,255,255,0.1)", true: "#6C3FC5" }}
-                thumbColor="white"
-              />
-            }
-          />
-        </View>
+          <Animated.View entering={staggerFadeUp(15)}>
+            <SettingRow
+              icon={Bell}
+              label="Task Reminders"
+              right={
+                <Switch
+                  value={taskReminders}
+                  onValueChange={setTaskReminders}
+                  trackColor={{
+                    false: "rgba(255,255,255,0.1)",
+                    true: "#6C3FC5",
+                  }}
+                  thumbColor="white"
+                />
+              }
+            />
+          </Animated.View>
+          <Animated.View entering={staggerFadeUp(16)}>
+            <SettingRow
+              icon={Bell}
+              label="Habit Reminders"
+              right={
+                <Switch
+                  value={habitReminders}
+                  onValueChange={setHabitReminders}
+                  trackColor={{
+                    false: "rgba(255,255,255,0.1)",
+                    true: "#6C3FC5",
+                  }}
+                  thumbColor="white"
+                />
+              }
+            />
+          </Animated.View>
+        </Animated.View>
 
         {/* Sync */}
-        <View className="gap-2">
+        <Animated.View entering={staggerFadeUp(17)} className="gap-2">
           <SectionLabel label="Sync" />
-          <SettingRow
-            icon={RefreshCw}
-            label="Auto Sync"
-            right={
-              <Switch
-                value={autoSync}
-                onValueChange={setAutoSync}
-                trackColor={{ false: "rgba(255,255,255,0.1)", true: "#6C3FC5" }}
-                thumbColor="white"
-              />
-            }
-          />
-        </View>
+          <Animated.View entering={staggerFadeUp(18)}>
+            <SettingRow
+              icon={RefreshCw}
+              label="Auto Sync"
+              right={
+                <Switch
+                  value={autoSync}
+                  onValueChange={setAutoSync}
+                  trackColor={{
+                    false: "rgba(255,255,255,0.1)",
+                    true: "#6C3FC5",
+                  }}
+                  thumbColor="white"
+                />
+              }
+            />
+          </Animated.View>
+        </Animated.View>
       </ScrollView>
     </SafeAreaView>
   );
