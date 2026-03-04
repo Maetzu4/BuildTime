@@ -26,7 +26,7 @@ function useProtectedRoute() {
     if (!onboardingComplete && !inOnboarding) {
       router.replace("/onboarding" as any);
     } else if (onboardingComplete && inOnboarding) {
-      router.replace("/(tabs)" as any);
+      router.replace("/home" as any);
     }
   }, [onboardingComplete, segments]);
 }

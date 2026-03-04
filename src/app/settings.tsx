@@ -18,12 +18,14 @@ import { ScrollView, Switch, Text, TouchableOpacity, View } from "react-native";
 import Animated from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+// CORRECCIÓN: Se cambió "value" por "hex" para evitar conflictos
+// con el parser de estilos en línea de Reanimated.
 const THEME_COLORS = [
-  { label: "Purple", value: "#6C3FC5" },
-  { label: "Blue", value: "#3B82F6" },
-  { label: "Green", value: "#10B981" },
-  { label: "Red", value: "#EF4444" },
-  { label: "Orange", value: "#F59E0B" },
+  { label: "Purple", hex: "#6C3FC5" },
+  { label: "Blue", hex: "#3B82F6" },
+  { label: "Green", hex: "#10B981" },
+  { label: "Red", hex: "#EF4444" },
+  { label: "Orange", hex: "#F59E0B" },
 ];
 
 function SectionLabel({ label }: { label: string }) {
@@ -117,12 +119,12 @@ export default function SettingsScreen() {
             <View className="flex-row gap-3">
               {THEME_COLORS.map((color, i) => (
                 <Animated.View
-                  key={color.value}
+                  key={color.hex} // CORRECCIÓN: Actualizado a color.hex
                   entering={staggerFadeUp(i + 3)}
                 >
                   <TouchableOpacity
                     className="w-9 h-9 rounded-full border-2 border-white/20"
-                    style={{ backgroundColor: color.value }}
+                    style={{ backgroundColor: color.hex }} // CORRECCIÓN: Actualizado a color.hex
                     activeOpacity={0.8}
                   />
                 </Animated.View>

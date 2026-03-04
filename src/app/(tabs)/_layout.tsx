@@ -10,8 +10,15 @@ import { CheckSquare, FolderKanban, Home, Repeat } from "lucide-react-native";
 import { useState } from "react";
 
 export default function TabsLayout() {
-  const tasks = useAppStore((s) => s.tasks);
-  const pendingTasks = tasks.filter((t) => t.status === "todo").length;
+  // MEJORA 1: Rendimiento en Zustand.
+  // En lugar de traer todo el array de `tasks` y filtrarlo en cada render,
+  // hacemos que el selector devuelva directamente el número de tareas pendientes.
+  // Así el Layout solo se re-renderiza cuando el número cambia, no cada vez que editas una tarea.
+  const pendingTasks = useAppStore(
+    (s) => s.tasks.filter((t) => t.status === "todo").length,
+  );
+
+  // Estados locales (Se mantienen igual, están perfectos)
   const [taskSheet, setTaskSheet] = useState(false);
   const [habitSheet, setHabitSheet] = useState(false);
   const [projectSheet, setProjectSheet] = useState(false);
@@ -35,6 +42,7 @@ export default function TabsLayout() {
           },
         }}
       >
+        {/* MEJORA 2: Orden y limpieza de las opciones de cada Screen */}
         <Tabs.Screen
           name="home"
           options={{
@@ -42,6 +50,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color }) => <Home size={20} color={color} />,
           }}
         />
+
         <Tabs.Screen
           name="tasks"
           options={{
@@ -51,6 +60,7 @@ export default function TabsLayout() {
             tabBarBadgeStyle: { backgroundColor: "#F87171", fontSize: 10 },
           }}
         />
+
         <Tabs.Screen
           name="habits"
           options={{
@@ -58,6 +68,7 @@ export default function TabsLayout() {
             tabBarIcon: ({ color }) => <Repeat size={20} color={color} />,
           }}
         />
+
         <Tabs.Screen
           name="projects"
           options={{
@@ -67,6 +78,7 @@ export default function TabsLayout() {
         />
       </Tabs>
 
+      {/* Overlays globales (Mantenemos la misma estructura, es ideal para FABs y Modales) */}
       <FAB
         onCreateTask={() => setTaskSheet(true)}
         onCreateHabit={() => setHabitSheet(true)}

@@ -61,7 +61,6 @@ export default function OnboardingScreen() {
 
   function finish() {
     completeOnboarding();
-    router.replace("/index" as any);
   }
 
   function handleNext() {
