@@ -1,63 +1,49 @@
+import { PROJECT_TIMELINE_LABELS, PROJECT_TIMELINES } from "@/lib/constants";
 import { useAppStore } from "@/lib/store";
-import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
-import { ArrowRight } from "lucide-react-native";
-import { useState } from "react";
-import { Text, TextInput, TouchableOpacity, View } from "react-native";
-import Animated, {
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  withTiming,
-} from "react-native-reanimated";
+import { ProjectTimeline } from "@/lib/types";
+import { ArrowLeft, ArrowRight } from "lucide-react-native";
+import { useRef, useState } from "react";
+import {
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const STEPS = [
   {
-    emoji: "⚡",
+    id: "1",
+    emoji: "🕓",
     title: "BuildTime",
     subtitle: "Build your best self, one task at a time",
-    cta: "Get Started",
   },
   {
+    id: "2",
     emoji: "📁",
     title: "Start with a project",
     subtitle: "Projects help you organize your tasks and habits",
-    cta: "Create project",
   },
   {
+    id: "3",
     emoji: "☁️",
     title: "Save your progress",
     subtitle: "Sign in to sync across devices. You can always do this later.",
-    cta: null,
   },
 ];
 
 export default function OnboardingScreen() {
-  const router = useRouter();
   const { completeOnboarding, addProject } = useAppStore();
+  const { width } = useWindowDimensions();
+  const flatListRef = useRef<FlatList>(null);
+
   const [step, setStep] = useState(0);
   const [projectName, setProjectName] = useState("");
-  const [timeline, setTimeline] = useState<"short" | "mid" | "long">("mid");
-
-  const translateX = useSharedValue(0);
-  const opacity = useSharedValue(1);
-
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ translateX: translateX.value }],
-    opacity: opacity.value,
-  }));
-
-  function animateTo(nextStep: number) {
-    opacity.value = withTiming(0, { duration: 180 });
-    translateX.value = withTiming(-30, { duration: 180 }, () => {
-      translateX.value = 40;
-      runOnJS(setStep)(nextStep);
-      translateX.value = withSpring(0, { damping: 18, stiffness: 280 });
-      opacity.value = withTiming(1, { duration: 220 });
-    });
-  }
+  const [timeline, setTimeline] = useState<ProjectTimeline>("mid");
 
   function finish() {
     completeOnboarding();
@@ -72,141 +58,171 @@ export default function OnboardingScreen() {
         targetDate: "2026-06-01",
       });
     }
-    if (step < 2) animateTo(step + 1);
-    else finish();
+    if (step < 2) {
+      flatListRef.current?.scrollToIndex({ index: step + 1, animated: true });
+    }
   }
 
-  function handleSkip() {
-    if (step < 2) animateTo(step + 1);
-    else finish();
+  function handleBack() {
+    if (step > 0) {
+      flatListRef.current?.scrollToIndex({ index: step - 1, animated: true });
+    }
   }
 
-  const timelineLabels = {
-    short: "Short term",
-    mid: "Mid term",
-    long: "Long term",
+  // Detectar cambios cuando el usuario hace swipe con el dedo
+  const handleScroll = (event: any) => {
+    const slideSize = event.nativeEvent.layoutMeasurement.width;
+    const currentIndex = Math.round(
+      event.nativeEvent.contentOffset.x / slideSize,
+    );
+    if (currentIndex !== step) {
+      setStep(currentIndex);
+    }
+  };
+
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: (typeof STEPS)[0];
+    index: number;
+  }) => {
+    return (
+      <View
+        style={{ width, paddingHorizontal: 32 }}
+        className="items-center justify-center flex-1"
+      >
+        {/* Icon */}
+        <View className="w-20 h-20 rounded-2xl items-center justify-center mb-6 bg-m3-surface-container">
+          <Text style={{ fontSize: 40 }}>{item.emoji}</Text>
+        </View>
+
+        {/* Title + subtitle */}
+        <Text className="text-m3-on-surface text-3xl font-bold text-center mb-3">
+          {item.title}
+        </Text>
+        <Text className="text-m3-on-surface-variant text-base text-center leading-relaxed mb-10">
+          {item.subtitle}
+        </Text>
+
+        {/* Step 1 — Project input */}
+        {index === 1 && (
+          <View className="w-full gap-4 mb-8">
+            <TextInput
+              placeholder="Project name"
+              placeholderClassName="text-m3-outline"
+              value={projectName}
+              onChangeText={setProjectName}
+              className="w-full h-14 border rounded-xl px-4 text-base bg-m3-surface-container border-m3-outline text-m3-on-surface"
+            />
+            <View className="flex-row border rounded-full overflow-hidden border-m3-outline">
+              {PROJECT_TIMELINES.map((t) => (
+                <TouchableOpacity
+                  key={t}
+                  onPress={() => setTimeline(t)}
+                  className={`flex-1 py-2.5 items-center ${timeline === t ? "bg-m3-primary" : "bg-transparent"}`}
+                >
+                  <Text
+                    className={`text-sm font-semibold ${timeline === t ? "text-m3-on-primary" : "text-m3-on-surface-variant"}`}
+                  >
+                    {PROJECT_TIMELINE_LABELS[t]}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {/* Step 2 — Sign in & Finish */}
+        {index === 2 && (
+          <View className="w-full gap-4 mb-8">
+            <TouchableOpacity
+              className="w-full h-14 rounded-full flex-row items-center justify-center gap-3 shadow-sm bg-m3-primary"
+              activeOpacity={0.8}
+            >
+              <Text className="text-m3-on-primary text-base font-bold">
+                Continue with Google
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={finish}
+              className="w-full h-14 rounded-full items-center justify-center bg-m3-surface-container"
+              activeOpacity={0.8}
+            >
+              <Text className="text-m3-on-surface text-base font-semibold">
+                Use locally, skip sign in
+              </Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    );
   };
 
   return (
-    <View className="flex-1">
-      <LinearGradient
-        colors={["#6C3FC5", "#3B82F6"]}
-        className="absolute inset-0"
-      />
+    <SafeAreaView className="flex-1 bg-m3-surface">
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{ flex: 1 }}
+      >
+        <FlatList
+          ref={flatListRef}
+          data={STEPS}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          bounces={false}
+          onMomentumScrollEnd={handleScroll}
+        />
 
-      <SafeAreaView className="flex-1">
-        <View className="flex-1 items-center justify-center px-8">
-          <Animated.View style={animStyle} className="items-center w-full">
-            {/* Icon */}
-            <View className="w-20 h-20 bg-white/20 rounded-2xl items-center justify-center mb-6">
-              <Text style={{ fontSize: 40 }}>{STEPS[step].emoji}</Text>
-            </View>
-
-            {/* Title + subtitle */}
-            <Text className="text-white text-3xl font-bold text-center mb-3">
-              {STEPS[step].title}
-            </Text>
-            <Text className="text-white/80 text-base text-center leading-relaxed mb-10">
-              {STEPS[step].subtitle}
-            </Text>
-
-            {/* Step 1 — project input */}
-            {step === 1 && (
-              <View className="w-full gap-4 mb-8">
-                <TextInput
-                  placeholder="Project name"
-                  placeholderTextColor="rgba(255,255,255,0.4)"
-                  value={projectName}
-                  onChangeText={setProjectName}
-                  className="w-full h-14 bg-white/15 border border-white/20 rounded-xl px-4 text-white text-base"
-                />
-                <View className="flex-row border border-white/20 rounded-full overflow-hidden">
-                  {(["short", "mid", "long"] as const).map((t) => (
-                    <TouchableOpacity
-                      key={t}
-                      onPress={() => setTimeline(t)}
-                      className={`flex-1 py-2.5 items-center ${
-                        timeline === t ? "bg-white/25" : ""
-                      }`}
-                    >
-                      <Text
-                        className={`text-sm font-semibold ${
-                          timeline === t ? "text-white" : "text-white/50"
-                        }`}
-                      >
-                        {timelineLabels[t]}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
+        {/* Navegación Inferior (Controles en las esquinas) */}
+        <View className="px-6 pb-6 pt-4 flex-row items-center justify-between">
+          {/* Esquina Izquierda: Botón Atrás (Aparece en vista 2 y 3) */}
+          <View className="w-24 items-start">
+            {step > 0 && (
+              <TouchableOpacity
+                onPress={handleBack}
+                className="flex-row items-center py-2 gap-1 rounded-full"
+                activeOpacity={0.7}
+              >
+                <ArrowLeft size={20} className="text-m3-primary" />
+                <Text className="text-m3-primary font-semibold text-base">
+                  Back
+                </Text>
+              </TouchableOpacity>
             )}
+          </View>
 
-            {/* Step 2 — sign in */}
-            {step === 2 && (
-              <View className="w-full gap-3 mb-8">
-                <TouchableOpacity
-                  className="w-full h-14 bg-white rounded-xl flex-row items-center justify-center gap-3"
-                  activeOpacity={0.9}
-                >
-                  <Text className="text-primary text-base font-semibold">
-                    Continue with Google
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={finish}
-                  className="w-full h-12 items-center justify-center"
-                >
-                  <Text className="text-white/70 text-base">
-                    Use locally, skip sign in
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            )}
+          {/* Indicadores de Progreso Centrales */}
+          <View className="flex-row gap-2">
+            {STEPS.map((_, i) => (
+              <View
+                key={i}
+                style={{ width: i === step ? 24 : 8 }}
+                className={`h-2 rounded-full ${i === step ? "bg-m3-primary" : "bg-m3-surface-container"}`}
+              />
+            ))}
+          </View>
 
-            {/* CTA steps 0 y 1 */}
+          {/* Esquina Derecha: Botón Adelante (Aparece en vista 1 y 2) */}
+          <View className="w-24 items-end">
             {step < 2 && (
-              <View className="w-full gap-3">
-                <TouchableOpacity
-                  onPress={handleNext}
-                  className="w-full h-14 bg-white rounded-xl flex-row items-center justify-center gap-2"
-                  activeOpacity={0.9}
-                >
-                  <Text className="text-primary text-base font-semibold">
-                    {step === 1 && !projectName.trim()
-                      ? "Skip"
-                      : STEPS[step].cta}
-                  </Text>
-                  <ArrowRight size={20} color="#6C3FC5" />
-                </TouchableOpacity>
-
-                {step > 0 && (
-                  <TouchableOpacity
-                    onPress={handleSkip}
-                    className="w-full h-12 items-center justify-center"
-                  >
-                    <Text className="text-white/50 text-base">
-                      Skip for now
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+              <TouchableOpacity
+                onPress={handleNext}
+                className="flex-row items-center py-2 gap-1 rounded-full"
+                activeOpacity={0.7}
+              >
+                <Text className="text-m3-primary font-semibold text-base">
+                  Next
+                </Text>
+                <ArrowRight size={20} className="text-m3-primary" />
+              </TouchableOpacity>
             )}
-          </Animated.View>
+          </View>
         </View>
-
-        {/* Progress dots */}
-        <View className="flex-row justify-center gap-2 pb-10">
-          {STEPS.map((_, i) => (
-            <View
-              key={i}
-              className={`h-2 rounded-full bg-white ${
-                i === step ? "w-6" : "w-2 opacity-30"
-              }`}
-            />
-          ))}
-        </View>
-      </SafeAreaView>
-    </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }

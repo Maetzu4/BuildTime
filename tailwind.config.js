@@ -29,6 +29,43 @@ module.exports = {
           foreground: "#1C1B1F",
         },
 
+        // ── Material Design 3 ──────────────────────────────────
+        m3: {
+          primary: "var(--m3-primary)",
+          "on-primary": "var(--m3-on-primary)",
+          "primary-container": "var(--m3-primary-container)",
+          "on-primary-container": "var(--m3-on-primary-container)",
+          secondary: "var(--m3-secondary)",
+          "on-secondary": "var(--m3-on-secondary)",
+          "secondary-container": "var(--m3-secondary-container)",
+          "on-secondary-container": "var(--m3-on-secondary-container)",
+          tertiary: "var(--m3-tertiary)",
+          "on-tertiary": "var(--m3-on-tertiary)",
+          "tertiary-container": "var(--m3-tertiary-container)",
+          "on-tertiary-container": "var(--m3-on-tertiary-container)",
+          error: "var(--m3-error)",
+          "on-error": "var(--m3-on-error)",
+          "error-container": "var(--m3-error-container)",
+          "on-error-container": "var(--m3-on-error-container)",
+          background: "var(--m3-background)",
+          "on-background": "var(--m3-on-background)",
+          surface: "var(--m3-surface)",
+          "on-surface": "var(--m3-on-surface)",
+          "surface-variant": "var(--m3-surface-variant)",
+          "on-surface-variant": "var(--m3-on-surface-variant)",
+          outline: "var(--m3-outline)",
+          "outline-variant": "var(--m3-outline-variant)",
+          shadow: "var(--m3-shadow)",
+          scrim: "var(--m3-scrim)",
+          "inverse-surface": "var(--m3-inverse-surface)",
+          "inverse-on-surface": "var(--m3-inverse-on-surface)",
+          "inverse-primary": "var(--m3-inverse-primary)",
+          // Surface containers
+          "surface-container": "var(--m3-surface-container)",
+          "surface-container-high": "var(--m3-surface-container-high)",
+          "surface-container-highest": "var(--m3-surface-container-highest)",
+        },
+
         // ── Surface ───────────────────────────────────────────
         card: {
           DEFAULT: "#1E1B26",

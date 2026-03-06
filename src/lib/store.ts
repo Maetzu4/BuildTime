@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { ThemeColorSource, ThemeMode } from "./theme";
 import type {
   Achievement,
   Habit,
@@ -284,6 +285,9 @@ interface AppState {
   onboardingStep: number;
   onboardingComplete: boolean;
   darkMode: boolean;
+  themeMode: ThemeMode;
+  themeSource: ThemeColorSource;
+  themeSeedColor: string;
   user: UserProfile;
   tasks: Task[];
   habits: Habit[];
@@ -299,6 +303,9 @@ interface AppState {
   completeOnboarding: () => void;
   toggleDarkMode: () => void;
   setDarkMode: (v: boolean) => void;
+  setThemeMode: (m: ThemeMode) => void;
+  setThemeSource: (s: ThemeColorSource) => void;
+  setThemeSeedColor: (c: string) => void;
   updateUser: (u: Partial<UserProfile>) => void;
   setProjectFilter: (id: string | null) => void;
   setSelectedDate: (d: string) => void;
@@ -329,6 +336,9 @@ export const useAppStore = create<AppState>((set) => ({
   onboardingStep: 0,
   onboardingComplete: false,
   darkMode: false,
+  themeMode: "system",
+  themeSource: "dynamic",
+  themeSeedColor: "#6C3FC5", // Default purple brand
   user: { name: "", email: "", avatar: "" },
   tasks: SAMPLE_TASKS,
   habits: SAMPLE_HABITS,
@@ -343,6 +353,9 @@ export const useAppStore = create<AppState>((set) => ({
   completeOnboarding: () => set({ onboardingComplete: true, navTab: "home" }),
   toggleDarkMode: () => set((s) => ({ darkMode: !s.darkMode })),
   setDarkMode: (v) => set({ darkMode: v }),
+  setThemeMode: (m) => set({ themeMode: m }),
+  setThemeSource: (s) => set({ themeSource: s }),
+  setThemeSeedColor: (c) => set({ themeSeedColor: c }),
   updateUser: (u) => set((s) => ({ user: { ...s.user, ...u } })),
   setProjectFilter: (id) => set({ selectedProjectFilter: id }),
   setSelectedDate: (d) => set({ selectedDate: d }),
