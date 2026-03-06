@@ -61,6 +61,8 @@ module.exports = {
           "inverse-on-surface": "var(--m3-inverse-on-surface)",
           "inverse-primary": "var(--m3-inverse-primary)",
           // Surface containers
+          "surface-container-lowest": "var(--m3-surface-container-lowest)",
+          "surface-container-low": "var(--m3-surface-container-low)",
           "surface-container": "var(--m3-surface-container)",
           "surface-container-high": "var(--m3-surface-container-high)",
           "surface-container-highest": "var(--m3-surface-container-highest)",

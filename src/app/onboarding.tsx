@@ -1,18 +1,30 @@
+import { Button } from "@/components/ui/button";
+import {
+  SegmentedButtonOption,
+  SegmentedButtons,
+} from "@/components/ui/segmented-buttons";
 import { PROJECT_TIMELINE_LABELS, PROJECT_TIMELINES } from "@/lib/constants";
 import { useAppStore } from "@/lib/store";
 import { ProjectTimeline } from "@/lib/types";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
+import { cssInterop } from "nativewind";
 import { useRef, useState } from "react";
 import {
   FlatList,
   KeyboardAvoidingView,
   Text,
   TextInput,
-  TouchableOpacity,
   useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+cssInterop(ArrowLeft, {
+  className: { target: "style", nativeStyleToProp: { color: true } },
+});
+cssInterop(ArrowRight, {
+  className: { target: "style", nativeStyleToProp: { color: true } },
+});
 
 const STEPS = [
   {
@@ -80,6 +92,12 @@ export default function OnboardingScreen() {
     }
   };
 
+  const timelineOptions: SegmentedButtonOption<ProjectTimeline>[] =
+    PROJECT_TIMELINES.map((t) => ({
+      label: PROJECT_TIMELINE_LABELS[t],
+      value: t,
+    }));
+
   const renderItem = ({
     item,
     index,
@@ -114,44 +132,28 @@ export default function OnboardingScreen() {
               onChangeText={setProjectName}
               className="w-full h-14 border rounded-xl px-4 text-base bg-m3-surface-container border-m3-outline text-m3-on-surface placeholder:text-m3-outline"
             />
-            <View className="flex-row border rounded-full overflow-hidden border-m3-outline">
-              {PROJECT_TIMELINES.map((t) => (
-                <TouchableOpacity
-                  key={t}
-                  onPress={() => setTimeline(t)}
-                  className={`flex-1 py-2.5 items-center ${timeline === t ? "bg-m3-primary" : "bg-transparent"}`}
-                >
-                  <Text
-                    className={`text-sm font-semibold ${timeline === t ? "text-m3-on-primary" : "text-m3-outline"}`}
-                  >
-                    {PROJECT_TIMELINE_LABELS[t]}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
+            <SegmentedButtons
+              options={timelineOptions}
+              value={timeline}
+              onChange={setTimeline}
+            />
           </View>
         )}
 
         {/* Step 2 — Sign in & Finish */}
         {index === 2 && (
           <View className="w-full gap-4 mb-8">
-            <TouchableOpacity
-              className="w-full h-14 rounded-full flex-row items-center justify-center gap-3 shadow-sm bg-m3-primary"
-              activeOpacity={0.8}
+            <Button
+              variant="filled"
+              fullWidth
+              onPress={() => {}}
+              className="h-14"
             >
-              <Text className="text-m3-on-primary text-base font-bold">
-                Continue with Google
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={finish}
-              className="w-full h-14 rounded-full items-center justify-center bg-m3-surface-container"
-              activeOpacity={0.8}
-            >
-              <Text className="text-m3-on-surface text-base font-semibold">
-                Use locally, skip sign in
-              </Text>
-            </TouchableOpacity>
+              Continue with Google
+            </Button>
+            <Button variant="tonal" fullWidth onPress={finish} className="h-14">
+              Use locally, skip sign in
+            </Button>
           </View>
         )}
       </View>
@@ -178,16 +180,14 @@ export default function OnboardingScreen() {
           {/* Esquina Izquierda: Botón Atrás (Aparece en vista 2 y 3) */}
           <View className="w-24 items-start">
             {step > 0 && (
-              <TouchableOpacity
+              <Button
+                variant="filled"
                 onPress={handleBack}
-                className="flex-row items-center py-2 gap-1 rounded-full"
-                activeOpacity={0.7}
+                icon={<ArrowLeft size={20} className="text-m3-on-primary" />}
+                className="px-2"
               >
-                <ArrowLeft size={20} className="text-m3-primary" />
-                <Text className="text-m3-primary font-semibold text-base">
-                  Back
-                </Text>
-              </TouchableOpacity>
+                Back
+              </Button>
             )}
           </View>
 
@@ -205,16 +205,14 @@ export default function OnboardingScreen() {
           {/* Esquina Derecha: Botón Adelante (Aparece en vista 1 y 2) */}
           <View className="w-24 items-end">
             {step < 2 && (
-              <TouchableOpacity
+              <Button
+                variant="filled"
                 onPress={handleNext}
-                className="flex-row items-center py-2 gap-1 rounded-full"
-                activeOpacity={0.7}
+                icon={<ArrowRight size={20} className="text-m3-on-primary" />}
+                className="px-2 flex-row-reverse"
               >
-                <Text className="text-m3-primary font-semibold text-base">
-                  Next
-                </Text>
-                <ArrowRight size={20} className="text-m3-primary" />
-              </TouchableOpacity>
+                Next
+              </Button>
             )}
           </View>
         </View>

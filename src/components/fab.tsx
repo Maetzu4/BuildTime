@@ -78,13 +78,16 @@ export function FAB({
               activeOpacity={0.8}
               className="flex-row items-center gap-3"
             >
-              <View className="bg-white/10 px-3 py-1.5 rounded-lg">
-                <Text className="text-white text-sm font-medium">
+              <View className="bg-m3-surface-container-high px-3 py-1.5 rounded-lg shadow-sm">
+                <Text className="text-m3-on-surface text-sm font-medium">
                   {act.label}
                 </Text>
               </View>
-              <View className="w-10 h-10 rounded-full bg-primary/20 items-center justify-center">
-                <act.icon size={20} color="#6C3FC5" />
+              <View className="w-10 h-10 rounded-full bg-m3-secondary-container items-center justify-center shadow-sm">
+                <act.icon
+                  size={20}
+                  className="text-m3-on-secondary-container"
+                />
               </View>
             </TouchableOpacity>
           ))}
@@ -95,17 +98,17 @@ export function FAB({
       <TouchableOpacity
         onPress={handlePress}
         activeOpacity={0.85}
-        className={`h-14 bg-primary rounded-2xl flex-row items-center gap-2 px-4 ${
+        className={`h-14 bg-m3-primary-container rounded-2xl flex-row items-center gap-2 px-4 shadow-sm ${
           isSingleAction ? "" : "min-w-14 justify-center"
         }`}
       >
         {expanded ? (
-          <X size={24} color="white" />
+          <X size={24} className="text-m3-on-primary-container" />
         ) : (
-          <Plus size={24} color="white" />
+          <Plus size={24} className="text-m3-on-primary-container" />
         )}
         {isSingleAction && (
-          <Text className="text-white text-sm font-semibold">
+          <Text className="text-m3-on-primary-container text-sm font-semibold">
             {actions[0].label}
           </Text>
         )}

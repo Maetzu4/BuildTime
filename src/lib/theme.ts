@@ -154,9 +154,16 @@ export function schemeToCssVariables(scheme: Material3Scheme) {
     "--m3-inverse-primary": scheme.inversePrimary,
 
     // Custom mappings commonly used in material apps
-    "--m3-surface-container": scheme.elevation.level2,
-    "--m3-surface-container-high": scheme.elevation.level3,
-    "--m3-surface-container-highest": scheme.elevation.level5,
+    "--m3-surface-container-lowest":
+      (scheme as any).surfaceContainerLowest || scheme.elevation.level0,
+    "--m3-surface-container-low":
+      (scheme as any).surfaceContainerLow || scheme.elevation.level1,
+    "--m3-surface-container":
+      (scheme as any).surfaceContainer || scheme.elevation.level2,
+    "--m3-surface-container-high":
+      (scheme as any).surfaceContainerHigh || scheme.elevation.level3,
+    "--m3-surface-container-highest":
+      (scheme as any).surfaceContainerHighest || scheme.elevation.level5,
   };
   return vars;
 }
