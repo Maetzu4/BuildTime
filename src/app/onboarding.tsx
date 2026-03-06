@@ -6,7 +6,6 @@ import { useRef, useState } from "react";
 import {
   FlatList,
   KeyboardAvoidingView,
-  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -26,7 +25,8 @@ const STEPS = [
     id: "2",
     emoji: "📁",
     title: "Start with a project",
-    subtitle: "Projects help you organize your tasks and habits",
+    subtitle:
+      "Projects help you organize your tasks and habits. You can always do this later.",
   },
   {
     id: "3",
@@ -46,11 +46,7 @@ export default function OnboardingScreen() {
   const [timeline, setTimeline] = useState<ProjectTimeline>("mid");
 
   function finish() {
-    completeOnboarding();
-  }
-
-  function handleNext() {
-    if (step === 1 && projectName.trim()) {
+    if (projectName.trim()) {
       addProject({
         name: projectName.trim(),
         description: "",
@@ -58,6 +54,10 @@ export default function OnboardingScreen() {
         targetDate: "2026-06-01",
       });
     }
+    completeOnboarding();
+  }
+
+  function handleNext() {
     if (step < 2) {
       flatListRef.current?.scrollToIndex({ index: step + 1, animated: true });
     }
@@ -110,10 +110,9 @@ export default function OnboardingScreen() {
           <View className="w-full gap-4 mb-8">
             <TextInput
               placeholder="Project name"
-              placeholderClassName="text-m3-outline"
               value={projectName}
               onChangeText={setProjectName}
-              className="w-full h-14 border rounded-xl px-4 text-base bg-m3-surface-container border-m3-outline text-m3-on-surface"
+              className="w-full h-14 border rounded-xl px-4 text-base bg-m3-surface-container border-m3-outline text-m3-on-surface placeholder:text-m3-outline"
             />
             <View className="flex-row border rounded-full overflow-hidden border-m3-outline">
               {PROJECT_TIMELINES.map((t) => (
@@ -123,7 +122,7 @@ export default function OnboardingScreen() {
                   className={`flex-1 py-2.5 items-center ${timeline === t ? "bg-m3-primary" : "bg-transparent"}`}
                 >
                   <Text
-                    className={`text-sm font-semibold ${timeline === t ? "text-m3-on-primary" : "text-m3-on-surface-variant"}`}
+                    className={`text-sm font-semibold ${timeline === t ? "text-m3-on-primary" : "text-m3-outline"}`}
                   >
                     {PROJECT_TIMELINE_LABELS[t]}
                   </Text>
@@ -161,10 +160,7 @@ export default function OnboardingScreen() {
 
   return (
     <SafeAreaView className="flex-1 bg-m3-surface">
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={{ flex: 1 }}
-      >
+      <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
         <FlatList
           ref={flatListRef}
           data={STEPS}

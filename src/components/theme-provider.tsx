@@ -1,7 +1,7 @@
 import { useAppStore } from "@/lib/store";
 import { generateM3Scheme, schemeToCssVariables } from "@/lib/theme";
 import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
-import { useColorScheme } from "nativewind";
+import { useColorScheme, vars } from "nativewind";
 import { useEffect, useMemo } from "react";
 import { useColorScheme as useRNColorScheme, View } from "react-native";
 
@@ -39,7 +39,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   }, [isDark, themeSource, themeSeedColor, androidTheme]);
 
   return (
-    <View style={cssVars as any} className="flex-1">
+    <View style={vars(cssVars) as any} className="flex-1">
       {children}
     </View>
   );

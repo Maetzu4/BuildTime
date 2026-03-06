@@ -335,7 +335,7 @@ export const useAppStore = create<AppState>((set) => ({
   navTab: "home",
   onboardingStep: 0,
   onboardingComplete: false,
-  darkMode: false,
+  darkMode: true,
   themeMode: "system",
   themeSource: "dynamic",
   themeSeedColor: "#6C3FC5", // Default purple brand
