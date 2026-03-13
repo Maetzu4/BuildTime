@@ -2,8 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { useTheme } from "react-native-paper";
-import Onboarding from "./(onboarding)/onboarding";
 import Home from "./(tabs)/home";
+import Onboarding from "./(tabs)/onboarding";
 
 const ONBOARDING_KEY = "onboarding_completed";
 
