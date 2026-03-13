@@ -2,6 +2,7 @@ import React, { useCallback, useRef, useState } from "react";
 import { FlatList, StyleSheet, View, ViewToken } from "react-native";
 import { Button, useTheme } from "react-native-paper";
 
+import { Stack } from "expo-router";
 import AccountStep from "../../components/onboarding/AccountStep";
 import CreateProjectStep from "../../components/onboarding/CreateProjectStep";
 import WelcomeStep from "../../components/onboarding/WelcomeStep";
@@ -17,8 +18,10 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // Callback que se ejecuta cuando cambia el elemento visible en el FlatList (el "slide" actual)
   const onViewableItemsChanged = useCallback(
     ({ viewableItems }: { viewableItems: ViewToken[] }) => {
+      // Actualizamos el índice actual para sincronizar los puntos indicadores (dots) y los botones
       if (viewableItems.length > 0 && viewableItems[0].index != null) {
         setCurrentIndex(viewableItems[0].index);
       }
@@ -26,10 +29,12 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
     [],
   );
 
+  // Configuración para determinar cuándo un elemento se considera "visible" (50% en pantalla)
   const viewabilityConfig = useRef({
     viewAreaCoveragePercentThreshold: 50,
   }).current;
 
+  // Funciones para avanzar y retroceder entre los pasos del onboarding
   const goNext = () => {
     if (currentIndex < STEPS.length - 1) {
       flatListRef.current?.scrollToIndex({
@@ -49,6 +54,7 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   };
 
   const renderItem = ({ item }: { item: { key: string } }) => {
+    // Renderiza el componente de paso correspondiente según la clave de la lista STEPS
     switch (item.key) {
       case "welcome":
         return <WelcomeStep colors={colors} />;
@@ -63,7 +69,9 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Paginated content */}
+      {/* Oculta el header de la navegación para la pantalla de Onboarding */}
+      <Stack.Screen options={{ headerShown: false }} />
+      {/* Contenido paginado (slides) usando FlatList horizontal */}
       <FlatList
         ref={flatListRef}
         data={STEPS}
@@ -76,11 +84,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
         viewabilityConfig={viewabilityConfig}
       />
 
-      {/* Bottom controls */}
+      {/* Controles de la parte inferior (Botones y Puntos) */}
       <View style={styles.bottomBar}>
-        {/* Back button */}
+        {/* Botón de retroceso: se muestra si no estamos en el primer paso */}
         {currentIndex > 0 ? (
-          <Button mode="text" onPress={goBack} textColor={colors.primary}>
+          <Button mode="contained" onPress={goBack} textColor={colors.primary}>
             Back
           </Button>
         ) : (

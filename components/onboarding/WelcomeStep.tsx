@@ -11,6 +11,7 @@ interface WelcomeStepProps {
 
 export default function WelcomeStep({ colors }: WelcomeStepProps) {
   return (
+    // Contenedor principal del slide, ocupa todo el ancho de la pantalla
     <View style={[styles.slide, { backgroundColor: colors.background }]}>
       <View style={styles.iconCircle}>
         <MaterialCommunityIcons
@@ -31,8 +32,8 @@ export default function WelcomeStep({ colors }: WelcomeStepProps) {
         variant="bodyLarge"
         style={[styles.subtitle, { color: colors.onSurfaceVariant }]}
       >
-        Organize your projects, manage your time and keep track of every
-        construction task.
+        Organiza tus proyectos, administra tu tiempo y mantén un registro de cada
+        tarea de construcción.
       </Text>
     </View>
   );

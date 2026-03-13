@@ -5,7 +5,7 @@ import { IconButton, Text } from "react-native-paper";
 
 const { width } = Dimensions.get("window");
 
-// Color options for the "create project" step
+// Opciones de colores predefinidos para la creación de proyectos
 const PROJECT_COLORS = [
   "#6750A4",
   "#E8175D",
@@ -15,7 +15,7 @@ const PROJECT_COLORS = [
   "#8E24AA",
 ];
 
-// Icon options for the "create project" step
+// Opciones de íconos predefinidos para la creación de proyectos
 const PROJECT_ICONS: (keyof typeof MaterialCommunityIcons.glyphMap)[] = [
   "home",
   "briefcase",
@@ -30,6 +30,7 @@ interface CreateProjectStepProps {
 }
 
 export default function CreateProjectStep({ colors }: CreateProjectStepProps) {
+  // Estado local para almacenar qué color e ícono han sido seleccionados
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedIcon, setSelectedIcon] = useState(0);
 
@@ -46,10 +47,10 @@ export default function CreateProjectStep({ colors }: CreateProjectStepProps) {
         variant="bodyMedium"
         style={[styles.subtitle, { color: colors.onSurfaceVariant }]}
       >
-        Give it a name, choose a color and an icon.
+        Dale un nombre, elige un color y un ícono.
       </Text>
 
-      {/* Project name input */}
+      {/* Input para el nombre del proyecto */}
       <TextInput
         placeholder="Project name"
         placeholderTextColor={colors.onSurfaceVariant}
@@ -63,7 +64,7 @@ export default function CreateProjectStep({ colors }: CreateProjectStepProps) {
         ]}
       />
 
-      {/* Color picker */}
+      {/* Selector de Color (Color picker) */}
       <Text
         variant="labelLarge"
         style={{ color: colors.onBackground, marginBottom: 8 }}
@@ -82,7 +83,7 @@ export default function CreateProjectStep({ colors }: CreateProjectStepProps) {
         ))}
       </View>
 
-      {/* Icon picker */}
+      {/* Selector de Ícono (Icon picker) */}
       <Text
         variant="labelLarge"
         style={{ color: colors.onBackground, marginTop: 12, marginBottom: 8 }}
@@ -111,7 +112,8 @@ export default function CreateProjectStep({ colors }: CreateProjectStepProps) {
         ))}
       </View>
 
-      {/* Preview card */}
+      {/* Tarjeta de vista previa (Preview card) 
+          Muestra cómo se verá el componente de proyecto con el color e ícono elegidos */}
       <View
         style={[
           styles.previewCard,

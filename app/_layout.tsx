@@ -1,3 +1,4 @@
+import { TopAppBar } from "@/components/home/TopAppBar";
 import { useMaterial3Theme } from "@pchmn/expo-material3-theme";
 import { Stack } from "expo-router";
 import { useMemo } from "react";
@@ -10,9 +11,13 @@ import {
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function Layout() {
+  // Obtiene el esquema de color del sistema (claro u oscuro)
   const colorScheme = useColorScheme();
+  
+  // Obtiene los tokens de diseño de Material Design 3 generados automáticamente
   const { theme } = useMaterial3Theme();
 
+  // Memoriza y construye el tema de react-native-paper basado en si es oscuro o claro
   const paperTheme = useMemo(
     () =>
       colorScheme === "dark"
@@ -22,17 +27,17 @@ export default function Layout() {
   );
 
   return (
+    // Proveedor del área segura (muescas de pantalla y gestos)
     <SafeAreaProvider>
+      {/* Proveedor principal del tema visual para toda la app */}
       <PaperProvider theme={paperTheme}>
         <Stack
           screenOptions={{
             headerStyle: {
-              backgroundColor: paperTheme.colors.primary,
+              backgroundColor: paperTheme.colors.background,
             },
-            headerTintColor: paperTheme.colors.onPrimary,
-            headerTitleStyle: {
-              fontWeight: "bold",
-            },
+            headerTitle: "",
+            headerLeft: () => <TopAppBar greeting showAvatar />,
           }}
         />
       </PaperProvider>
