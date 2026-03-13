@@ -1,8 +1,6 @@
 import React from "react";
 import { ScrollView, View } from "react-native";
 import { useTheme } from "react-native-paper";
-
-import { Stack } from "expo-router";
 import { HabitsTodaySection } from "../../components/home/HabitsTodaySection";
 import { ProjectFilterStrip } from "../../components/home/ProjectFilterStrip";
 import { SummaryCard } from "../../components/home/SummaryCard";
@@ -58,9 +56,6 @@ export default function Home() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
-      {/* Configura el header de la navegación Stack para que esté visible en Home */}
-      <Stack.Screen options={{ headerShown: true }} />
-      
       {/* Scroll global para permitir navegar todas las secciones de una vez */}
       <ScrollView
         style={{ flex: 1 }}

@@ -33,6 +33,7 @@ export default function CreateProjectStep({ colors }: CreateProjectStepProps) {
   // Estado local para almacenar qué color e ícono han sido seleccionados
   const [selectedColor, setSelectedColor] = useState(0);
   const [selectedIcon, setSelectedIcon] = useState(0);
+  const [projectName, setProjectName] = useState("");
 
   return (
     <View style={[styles.slide, { backgroundColor: colors.background }]}>
@@ -47,13 +48,15 @@ export default function CreateProjectStep({ colors }: CreateProjectStepProps) {
         variant="bodyMedium"
         style={[styles.subtitle, { color: colors.onSurfaceVariant }]}
       >
-        Dale un nombre, elige un color y un ícono.
+        Give it a name, choose a color and an icon.
       </Text>
 
       {/* Input para el nombre del proyecto */}
       <TextInput
         placeholder="Project name"
         placeholderTextColor={colors.onSurfaceVariant}
+        value={projectName}
+        onChangeText={setProjectName}
         style={[
           styles.input,
           {
@@ -126,7 +129,7 @@ export default function CreateProjectStep({ colors }: CreateProjectStepProps) {
           color="#fff"
         />
         <Text variant="titleMedium" style={{ color: "#fff", marginLeft: 12 }}>
-          My Project
+          {projectName || "Project Name"}
         </Text>
       </View>
     </View>

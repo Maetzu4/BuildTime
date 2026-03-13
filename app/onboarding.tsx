@@ -3,9 +3,9 @@ import { FlatList, StyleSheet, View, ViewToken } from "react-native";
 import { Button, useTheme } from "react-native-paper";
 
 import { Stack } from "expo-router";
-import AccountStep from "../../components/onboarding/AccountStep";
-import CreateProjectStep from "../../components/onboarding/CreateProjectStep";
-import WelcomeStep from "../../components/onboarding/WelcomeStep";
+import AccountStep from "../components/onboarding/AccountStep";
+import CreateProjectStep from "../components/onboarding/CreateProjectStep";
+import WelcomeStep from "../components/onboarding/WelcomeStep";
 
 interface OnboardingProps {
   onComplete: () => void;
@@ -88,7 +88,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
       <View style={styles.bottomBar}>
         {/* Botón de retroceso: se muestra si no estamos en el primer paso */}
         {currentIndex > 0 ? (
-          <Button mode="contained" onPress={goBack} textColor={colors.primary}>
+          <Button
+            mode="contained"
+            onPress={goBack}
+            textColor={colors.inversePrimary}
+          >
             Back
           </Button>
         ) : (
@@ -114,7 +118,11 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
         {/* Next button */}
         {currentIndex < STEPS.length - 1 ? (
-          <Button mode="text" onPress={goNext} textColor={colors.primary}>
+          <Button
+            mode="contained"
+            onPress={goNext}
+            textColor={colors.inversePrimary}
+          >
             Next
           </Button>
         ) : (

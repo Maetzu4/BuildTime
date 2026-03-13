@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { useTheme } from "react-native-paper";
-import Home from "./(tabs)/home";
-import Onboarding from "./(tabs)/onboarding";
+import { Redirect } from "expo-router";
 import { useAppStore } from "../lib/store"; // <-- Import store
 
 export default function Index() {
@@ -40,9 +39,9 @@ export default function Index() {
 
   // Si no hay un modo de cuenta seleccionado, muestra la pantalla de onboarding (bienvenida)
   if (!accountMode) {
-    return <Onboarding onComplete={() => {}} />;
+    return <Redirect href="/onboarding" />;
   }
 
   // Si ya hay un modo seleccionado (local, demo o cloud), va directamente al Home principal
-  return <Home />;
+  return <Redirect href="/(tabs)/home" />;
 }

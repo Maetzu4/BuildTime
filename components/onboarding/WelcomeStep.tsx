@@ -32,8 +32,8 @@ export default function WelcomeStep({ colors }: WelcomeStepProps) {
         variant="bodyLarge"
         style={[styles.subtitle, { color: colors.onSurfaceVariant }]}
       >
-        Organiza tus proyectos, administra tu tiempo y mantén un registro de cada
-        tarea de construcción.
+        Organize your projects, manage your time and keep a record of each
+        construction task.
       </Text>
     </View>
   );

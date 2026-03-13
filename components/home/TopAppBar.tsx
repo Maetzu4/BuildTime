@@ -1,8 +1,9 @@
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
-import { StyleSheet, View, Alert } from "react-native";
-import { Avatar, IconButton, Text, useTheme, Menu } from "react-native-paper";
-import { useAppStore } from "../../lib/store";
+import { Alert, StyleSheet, View } from "react-native";
+import { Avatar, IconButton, Menu, Text, useTheme } from "react-native-paper";
 import { exportData, importData } from "../../lib/dataTransfer";
+import { useAppStore } from "../../lib/store";
 
 export function TopAppBar({
   greeting,
@@ -11,6 +12,7 @@ export function TopAppBar({
   greeting?: boolean;
   showAvatar?: boolean;
 }) {
+  const router = useRouter();
   const { colors } = useTheme();
   // Conectamos estado global
   const accountMode = useAppStore((s) => s.accountMode);
@@ -48,7 +50,7 @@ export function TopAppBar({
           text: "Login Falso (Mock)",
           onPress: () => setAccountMode("cloud"),
         },
-      ]
+      ],
     );
   };
 
@@ -63,9 +65,12 @@ export function TopAppBar({
         {
           text: "Reiniciar",
           style: "destructive",
-          onPress: () => clearData(),
+          onPress: () => {
+            clearData();
+            router.replace("/onboarding");
+          },
         },
-      ]
+      ],
     );
   };
 
